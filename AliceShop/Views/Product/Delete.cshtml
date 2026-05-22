@@ -1,0 +1,142 @@
+﻿@model AliceShop.Models.Product
+
+@{
+    ViewData["Title"] = "Xác nhận xóa sản phẩm";
+
+    // 1. XỬ LÝ LỌC ẢNH CHÍNH XÁC: Lấy ảnh đầu tiên trong mảng ImageUrls mới để tránh lỗi vỡ ảnh
+    var mainImageUrl = "/images/placeholder.png";
+    if (Model.ImageUrls != null && Model.ImageUrls.Any())
+    {
+        mainImageUrl = Model.ImageUrls.First();
+    }
+    else if (!string.IsNullOrEmpty(Model.ImageUrl))
+    {
+        mainImageUrl = Model.ImageUrl;
+    }
+
+    // Tự động thêm dấu "/" nếu thiếu đối với các file ảnh cục bộ
+    if (!mainImageUrl.StartsWith("/") && !mainImageUrl.StartsWith("http://") && !mainImageUrl.StartsWith("https://"))
+    {
+        mainImageUrl = "/" + mainImageUrl;
+    }
+
+    // 2. CHUẨN HÓA DANH MỤC: Đọc danh sách từ Controller truyền sang để map tên chữ công cộng
+    var categories = ViewBag.CategoriesList as IEnumerable<AliceShop.Models.Category> ?? new List<AliceShop.Models.Category>();
+    var categoryName = categories.FirstOrDefault(c => c.Id == Model.CategoryId)?.Name ?? $"Mã số: {Model.CategoryId}";
+}
+
+<div class="container py-4">
+    <div class="mb-4">
+        <a asp-action="Index" class="text-secondary text-decoration-none small hover-text-warning">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách quản lý
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden bg-white mx-auto" style="max-width: 850px;">
+        <div class="card-header bg-danger text-light py-3 px-4 border-bottom border-danger border-opacity-25">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold tracking-widest text-white text-uppercase">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Cảnh báo: Xác nhận xóa sản phẩm?
+                </h5>
+                <span class="badge bg-black bg-opacity-25">Mã định danh: #@Model.Id</span>
+            </div>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+            <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+                <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                <div>
+                    Hành động này <strong>không thể hoàn tác</strong>. Dữ liệu trang sức, hình ảnh và thông tin liên quan đến sản phẩm này sẽ bị xóa vĩnh viễn khỏi hệ thống bộ nhớ tạm của AliceShop.
+                </div>
+            </div>
+
+            <div class="row g-4 align-items-center">
+                <div class="col-md-4 text-center">
+                    <div class="rounded-3 bg-light border p-3 d-flex align-items-center justify-content-center overflow-hidden ratio ratio-1x1 mx-auto shadow-sm" style="max-width: 250px;">
+                        <img src="@mainImageUrl" class="w-100 h-100 object-fit-cover rounded grayscale-hover" alt="@Model.Name" />
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <div class="table-responsive border rounded-3 bg-light bg-opacity-25">
+                        <table class="table table-borderless align-middle mb-0">
+                            <tbody>
+                                <tr class="border-bottom border-light">
+                                    <td class="fw-bold text-secondary ps-3 py-2.5" style="width: 200px;">Tên trang sức:</td>
+                                    <td class="text-dark fw-bold text-uppercase">@Html.DisplayFor(model => model.Name)</td>
+                                </tr>
+                                <tr class="border-bottom border-light">
+                                    <td class="fw-bold text-secondary ps-3 py-2.5">Nhóm danh mục:</td>
+                                    <td>
+                                        <span class="badge bg-dark text-warning px-2.5 py-1.5 rounded-pill fs-7 fw-semibold shadow-sm">
+                                            <i class="bi bi-tag-fill me-1 small"></i> @categoryName
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr class="border-bottom border-light">
+                                    <td class="fw-bold text-secondary ps-3 py-2.5">Giá niêm yết:</td>
+                                    <td class="text-danger fw-bold fs-5">@string.Format("{0:N0} đ", Model.Price)</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-secondary ps-3 py-2.5 align-top pt-2">Mô tả tóm tắt:</td>
+                                    <td class="text-muted small text-truncate-2 lh-base" style="text-align: justify; padding-right: 15px;">
+                                        @Html.DisplayFor(model => model.Description)
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-5 pt-3 border-top d-flex gap-2 justify-content-end">
+                <form asp-action="Delete" method="post" class="d-flex gap-2 w-100 justify-content-end">
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2">
+                        Hủy bỏ, quay lại
+                    </a>
+                    <button type="submit" class="btn btn-danger px-4 py-2 fw-bold shadow-sm">
+                        <i class="bi bi-trash3-fill me-1"></i> Xác nhận xóa hẳn
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .tracking-widest {
+        letter-spacing: 1px;
+    }
+
+    .object-fit-cover {
+        object-fit: cover;
+    }
+
+    .hover-text-warning:hover {
+        color: #ffc107 !important;
+    }
+
+    .fs-7 {
+        font-size: 0.8rem;
+    }
+
+    /* Tạo hiệu ứng mờ nhẹ cho ảnh sản phẩm sắp bị xóa */
+    .grayscale-hover {
+        filter: grayscale(20%);
+        transition: filter 0.2s ease-in-out;
+    }
+
+        .grayscale-hover:hover {
+            filter: grayscale(0%);
+        }
+
+    /* Giới hạn text mô tả trong 2 dòng cho gọn form xóa */
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        white-space: normal;
+    }
+</style>

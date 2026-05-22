@@ -1,0 +1,50 @@
+﻿@model IEnumerable<AliceShop.Models.Category>
+
+@{
+    ViewData["Title"] = "Quản lý danh mục";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<div class="container py-4" style="max-width: 800px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold text-dark mb-1"><i class="bi bi-tags-fill text-secondary me-2"></i>Danh Mục Sản Phẩm</h1>
+            <p class="text-muted mb-0">Quản lý các nhóm hàng trang sức và phụ kiện</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary d-flex align-items-center gap-2 shadow-sm">
+            <i class="bi bi-plus-lg"></i> Thêm danh mục
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light text-uppercase fs-7 text-muted border-bottom">
+                <tr>
+                    <th class="ps-4" style="width: 100px;">Mã số</th>
+                    <th>Tên danh mục</th>
+                    <th class="text-end pe-4" style="width: 200px;">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="ps-4 fw-semibold text-secondary">#@item.Id</td>
+                        <td><span class="fw-bold text-dark">@item.Name</span></td>
+                        <td class="text-end pe-4">
+                            <div class="btn-group shadow-sm" role="group">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

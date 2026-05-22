@@ -1,0 +1,138 @@
+﻿@model IEnumerable<AliceShop.Models.Product>
+
+@{
+    ViewData["Title"] = "Trang Quản Trị - Danh sách sản phẩm";
+
+    // Lấy danh sách danh mục từ ViewBag để chuẩn bị ánh xạ ID -> Name
+    var categories = ViewBag.CategoriesList as IEnumerable<AliceShop.Models.Category> ?? new List<AliceShop.Models.Category>();
+}
+
+<!-- Nhúng Bootstrap Icons trực tiếp để tránh lỗi Section -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<div class="container-fluid px-4 py-4">
+    <!-- Header Admin -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a asp-action="Create" class="btn btn-primary d-flex align-items-center gap-2 shadow-sm">
+            <i class="bi bi-plus-lg"></i> Thêm sản phẩm mới
+        </a>
+    </div>
+
+    <!-- Bảng danh sách -->
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-uppercase fs-7 text-muted border-bottom">
+                    <tr>
+                        <th class="ps-4" style="width: 80px;">@Html.DisplayNameFor(model => model.Id)</th>
+                        <th style="width: 100px;">Hình ảnh</th>
+                        <th>@Html.DisplayNameFor(model => model.Name)</th>
+                        <th>@Html.DisplayNameFor(model => model.CategoryId)</th>
+                        <th class="text-end" style="width: 150px;">@Html.DisplayNameFor(model => model.Price)</th>
+                        <th style="max-width: 300px;">@Html.DisplayNameFor(model => model.Description)</th>
+                        <th class="text-end pe-4" style="width: 200px;">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <!-- ID sản phẩm -->
+                            <td class="ps-4 fw-semibold text-secondary">
+                                #@Html.DisplayFor(modelItem => item.Id)
+                            </td>
+
+                            <!-- Hình ảnh Thumbnail -->
+                            <!-- TÌM ĐOẠN HIỂN THỊ ẢNH THUMBNAIL TRONG INDEX.CSHTML VÀ THAY THẾ BẰNG ĐOẠN NÀY -->
+                            <td>
+                                <div class="rounded bg-light border d-flex align-items-center justify-content-center overflow-hidden shadow-sm" style="width: 60px; height: 60px;">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        // Logic xử lý chuỗi thông minh: Tự thêm dấu "/" nếu là đường dẫn nội bộ và chưa có dấu gạch chéo
+                                        var displayUrl = item.ImageUrl;
+                                        if (!displayUrl.StartsWith("/") && !displayUrl.StartsWith("http://") && !displayUrl.StartsWith("https://"))
+                                        {
+                                            displayUrl = "/" + displayUrl;
+                                        }
+
+                                        <img src="@displayUrl" class="w-100 h-100 object-fit-cover" alt="@item.Name" />
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-image text-muted fs-4"></i>
+                                    }
+                                </div>
+                            </td>
+
+                            <!-- Tên sản phẩm -->
+                            <td>
+                                <div class="fw-bold text-dark text-truncate" style="max-width: 250px;" title="@item.Name">
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </div>
+                            </td>
+
+                            <!-- DANH MỤC: Đã chuyển đổi từ hiển thị ID thô sang Tên danh mục chữ trực quan -->
+                            <td>
+                                @{
+                                    var categoryName = categories.FirstOrDefault(c => c.Id == item.CategoryId)?.Name ?? "Chưa phân loại";
+                                }
+                                <span class="badge bg-warning text-dark px-2.5 py-1.5 rounded-pill fs-7 fw-bold shadow-sm">
+                                    <i class="bi bi-tag-fill me-1 small"></i> @categoryName
+                                </span>
+                            </td>
+
+                            <!-- Giá tiền định dạng VND -->
+                            <td class="text-end fw-bold text-danger">
+                                @string.Format("{0:N0} đ", item.Price)
+                            </td>
+
+                            <!-- Mô tả ngắn gọn -->
+                            <td>
+                                <div class="text-muted text-truncate-2 small" style="max-width: 300px;">
+                                    @Html.DisplayFor(modelItem => item.Description)
+                                </div>
+                            </td>
+
+                            <!-- Các nút chức năng quản trị -->
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm" role="group">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning" title="Sửa thông tin">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info" title="Xem chi tiết">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Xóa sản phẩm">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fs-7 {
+        font-size: 0.8rem;
+    }
+
+    .object-fit-cover {
+        object-fit: cover;
+    }
+
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        white-space: normal;
+    }
+
+    .table-hover tbody tr {
+        transition: background-color 0.15s ease-in-out;
+    }
+</style>

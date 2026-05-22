@@ -1,0 +1,52 @@
+﻿@model AliceShop.Models.Category
+
+@{
+    ViewData["Title"] = "Xác nhận xóa danh mục";
+}
+
+<div class="container py-4">
+    <div class="mb-4">
+        <a asp-action="Index" class="text-secondary text-decoration-none small hover-text-warning">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden bg-white mx-auto" style="max-width: 600px;">
+        <div class="card-header bg-danger text-light py-3 px-4 border-bottom border-danger border-opacity-25">
+            <h5 class="mb-0 fw-bold tracking-widest text-white text-uppercase">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>Xác nhận xóa danh mục?
+            </h5>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+            <div class="alert alert-danger mb-4 small" role="alert">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                Hành động này sẽ xóa danh mục <strong>@Model.Name</strong> vĩnh viễn. Hãy chắc chắn rằng không có sản phẩm nào đang thuộc nhóm danh mục này trước khi xóa.
+            </div>
+
+            <table class="table table-borderless align-middle mb-4 bg-light bg-opacity-25 border rounded-3">
+                <tbody>
+                    <tr>
+                        <td class="fw-bold text-secondary ps-3 py-3" style="width: 180px;">Tên danh mục:</td>
+                        <td class="text-dark fw-bold text-uppercase">@Model.Name</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <form asp-action="Delete" method="post" class="d-flex gap-2 justify-content-end border-top pt-4">
+                <a asp-action="Index" class="btn btn-outline-secondary px-4">Hủy bỏ</a>
+                <button type="submit" class="btn btn-danger px-4 fw-bold shadow-sm">Xác nhận xóa</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .tracking-widest {
+        letter-spacing: 1px;
+    }
+
+    .hover-text-warning:hover {
+        color: #ffc107 !important;
+    }
+</style>

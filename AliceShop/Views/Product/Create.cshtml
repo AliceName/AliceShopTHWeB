@@ -1,0 +1,163 @@
+﻿@model AliceShop.Models.Product
+
+@{
+    ViewData["Title"] = "Thêm sản phẩm mới";
+}
+
+<div class="container py-4">
+    <div class="mb-4">
+        <a asp-action="Index" class="text-secondary text-decoration-none small hover-text-warning">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách quản lý
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden bg-white mx-auto" style="max-width: 800px;">
+        <div class="card-header bg-dark text-light py-3 px-4 border-bottom border-warning border-opacity-25">
+            <h5 class="mb-0 fw-bold tracking-widest text-warning text-uppercase">
+                <i class="bi bi-plus-circle-fill text-warning me-2"></i>Thêm trang sức mới vào hệ thống
+            </h5>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+            <form asp-action="Create" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger p-2 small d-none" id="valSummary"></div>
+
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label asp-for="Name" class="form-label fw-bold text-secondary small text-uppercase">Tên sản phẩm trang sức <span class="text-danger">*</span></label>
+                            <input asp-for="Name" class="form-control form-control-lg border-2" placeholder="Ví dụ: Nhẫn Kim Cương Vàng Tây 18K" />
+                            <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="CategoryId" class="form-label fw-bold text-secondary small text-uppercase">Phân loại danh mục <span class="text-danger">*</span></label>
+                            <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select border-2">
+                                <option value="">-- Chọn nhóm trang sức --</option>
+                            </select>
+                            <span asp-validation-for="CategoryId" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Price" class="form-label fw-bold text-secondary small text-uppercase">Giá bán niêm yết (VND) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input asp-for="Price" type="number" class="form-control border-2" placeholder="Nhập số tiền..." />
+                                <span class="input-group-text border-2 bg-secondary bg-opacity-10 fw-bold text-secondary">đ</span>
+                            </div>
+                            <span asp-validation-for="Price" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label fw-bold text-secondary small text-uppercase">Ảnh đại diện chính <span class="text-danger">*</span></label>
+                            <input type="file" name="imageUrl" class="form-control border-2" accept="image/*" id="mainImageInput" required />
+                        </div>
+                        <div class="mt-2 d-none" id="mainPreviewContainer">
+                            <img id="mainImagePreview" src="#" class="rounded border p-1 shadow-sm bg-light" style="height: 75px; object-fit: contain;" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label fw-bold text-secondary small text-uppercase">Album ảnh chi tiết (Nhiều ảnh)</label>
+                            <input type="file" name="imageUrls" class="form-control border-2" accept="image/*" multiple id="galleryInputs" />
+                        </div>
+                        <div class="mt-2 d-none" id="galleryPreviewContainer">
+                            <div class="d-flex gap-2 flex-wrap" id="galleryPreviewRow"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label asp-for="Description" class="form-label fw-bold text-secondary small text-uppercase">Mô tả thông số chi tiết sản phẩm</label>
+                            <textarea asp-for="Description" class="form-control border-2" rows="4" placeholder="Nhập chất liệu, ý nghĩa chế tác, chính sách bảo hành riêng của món trang sức phụ kiện này..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-5 pt-3 border-top d-flex gap-2 justify-content-end">
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2">
+                        Hủy bỏ
+                    </a>
+                    <button type="submit" class="btn btn-warning px-4 py-2 text-dark fw-bold shadow-sm">
+                        <i class="bi bi-check-circle-fill me-1"></i> Lưu và Phát hành
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .tracking-widest {
+        letter-spacing: 1px;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #ffc107 !important;
+        box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.15) !important;
+    }
+
+    .hover-text-warning:hover {
+        color: #ffc107 !important;
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var summary = document.getElementById("valSummary");
+            if (summary && summary.innerText.trim() !== "") {
+                summary.classList.remove("d-none");
+            }
+        });
+
+        // ── JS Xem trước ảnh đại diện chính ──
+        document.getElementById('mainImageInput').addEventListener('change', function (event) {
+            var input = event.target;
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var preview = document.getElementById('mainImagePreview');
+                    preview.src = e.target.result;
+                    document.getElementById('mainPreviewContainer').classList.remove('d-none');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        });
+
+        // ── JS Xem trước album ảnh phụ chi tiết ──
+        document.getElementById('galleryInputs').addEventListener('change', function (event) {
+            var input = event.target;
+            var previewRow = document.getElementById('galleryPreviewRow');
+            var container = document.getElementById('galleryPreviewContainer');
+
+            previewRow.innerHTML = '';
+
+            if (input.files && input.files.length > 0) {
+                container.classList.remove('d-none');
+                Array.from(input.files).forEach(function (file) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var div = document.createElement('div');
+                        div.innerHTML = `<img src="${e.target.result}" class="rounded border p-1 shadow-sm bg-white" style="height: 70px; width: 70px; object-fit: cover;" />`;
+                        previewRow.appendChild(div);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            } else {
+                container.classList.add('d-none');
+            }
+        });
+    </script>
+}

@@ -1,0 +1,132 @@
+﻿@model IEnumerable<AliceShop.Models.Product>
+
+@{
+    ViewData["Title"] = "Bộ Sưu Tập Trang Sức";
+    // Lấy danh sách danh mục từ ViewBag để hiển thị thẻ nhãn (Badge) tên chữ nếu cần
+    var categories = ViewBag.CategoriesList as IEnumerable<AliceShop.Models.Category> ?? new List<AliceShop.Models.Category>();
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <span class="text-warning text-uppercase tracking-widest small fw-bold mb-1 d-block">AliceShop Collection</span>
+        <h1 class="fw-bold text-dark position-relative d-inline-block pb-2">
+            Kiệt Tác Trang Sức Chế Tác
+        </h1>
+        <p class="text-muted small mt-2">Tôn vinh diện mạo quý phái, lộng lẫy và thời thượng</p>
+    </div>
+
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+        @foreach (var item in Model)
+        {
+            // Xử lý logic chuỗi đường dẫn ảnh an toàn để tránh bị vỡ hình
+            var displayUrl = "/images/placeholder.png";
+            if (item.ImageUrls != null && item.ImageUrls.Any())
+            {
+                displayUrl = item.ImageUrls.First();
+            }
+            else if (!string.IsNullOrEmpty(item.ImageUrl))
+            {
+                displayUrl = item.ImageUrl;
+            }
+
+            if (!displayUrl.StartsWith("/") && !displayUrl.StartsWith("http://") && !displayUrl.StartsWith("https://"))
+            {
+                displayUrl = "/" + displayUrl;
+            }
+
+            // Lấy tên danh mục chữ dựa trên Id
+            var categoryName = categories.FirstOrDefault(c => c.Id == item.CategoryId)?.Name ?? "Trang sức";
+
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden bg-white product-card transition-all position-relative">
+
+                    <span class="position-absolute top-0 start-0 m-2 badge bg-dark text-warning px-2.5 py-1.5 rounded-pill fs-8 fw-semibold z-3 shadow-sm border border-warning border-opacity-10">
+                        @categoryName
+                    </span>
+
+                    <a asp-action="Details" asp-route-id="@item.Id" class="d-block ratio ratio-1x1 overflow-hidden bg-light border-bottom border-light">
+                        <img src="@displayUrl" class="w-100 h-100 object-fit-cover card-img-top img-zoom transition-all" alt="@item.Name" loading="lazy" />
+                    </a>
+
+                    <div class="card-body p-3 d-flex flex-column justify-content-between">
+                        <div>
+                            <h6 class="card-title fw-bold text-dark text-uppercase lh-base mb-2 text-truncate-2" title="@item.Name">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none text-dark hover-text-warning transition-all">
+                                    @item.Name
+                                </a>
+                            </h6>
+
+                            <p class="card-text text-muted small text-truncate mb-3">@item.Description</p>
+                        </div>
+
+                        <div class="pt-2 border-top border-light d-flex align-items-center justify-content-between">
+                            <div class="d-flex flex-column">
+                                <span class="text-danger fw-bold fs-5">@string.Format("{0:N0}đ", item.Price)</span>
+                            </div>
+
+                            <form asp-controller="ShoppingCart" asp-action="AddToCart" method="get" class="m-0">
+                                <input type="hidden" name="productId" value="@item.Id" />
+                                <input type="hidden" name="quantity" value="1" />
+                                <button type="submit" class="btn btn-warning btn-sm text-dark rounded-circle d-flex align-items-center justify-content-center p-2 shadow-sm hover-scale" title="Thêm vào giỏ hàng" style="width: 36px; height: 36px;">
+                                    <i class="bi bi-bag-plus-fill fs-6"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .tracking-widest {
+        letter-spacing: 2px;
+    }
+
+    .fs-8 {
+        font-size: 0.7rem;
+    }
+
+    .object-fit-cover {
+        object-fit: cover;
+    }
+
+    .transition-all {
+        transition: all 0.3s ease-in-out;
+    }
+
+    /* Hiệu ứng đổ bóng và đẩy nhẹ thẻ lên khi di chuột qua */
+    .product-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08) !important;
+    }
+
+        /* Hiệu ứng zoom nhẹ hình ảnh khi rê chuột vào khung */
+        .product-card:hover .img-zoom {
+            transform: scale(1.06);
+        }
+
+    /* Đổi màu chữ tên sản phẩm sang vàng khi hover */
+    .hover-text-warning:hover {
+        color: #ffc107 !important;
+    }
+
+    /* Ép text tên sản phẩm chỉ hiển thị tối đa 2 dòng, tránh lệch ô */
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        white-space: normal;
+    }
+
+    /* Phóng to nút giỏ hàng một chút khi rê chuột */
+    .hover-scale:hover {
+        transform: scale(1.1);
+        background-color: #e0a800 !important;
+    }
+</style>
