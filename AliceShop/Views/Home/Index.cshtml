@@ -1,112 +1,153 @@
-﻿@{
-    ViewData["Title"] = "Trang Chủ | Hệ Thống Trang Sức Cao Cấp";
+﻿@model IEnumerable<AliceShop.Models.Product>
+
+@{
+    ViewData["Title"] = "AliceShop | Hệ Thống Trang Sức Cao Cấp";
 }
 
-<div class="position-relative overflow-hidden p-5 text-center bg-dark text-light border-bottom border-warning border-opacity-10 shadow-sm rounded-4 mb-5"
-     style="background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.85)), url('https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1200') no-repeat center/cover; min-height: 400px; display: flex; align-items: center;">
-    <div class="col-md-8 p-lg-5 mx-auto my-3">
-        <span class="text-warning text-uppercase tracking-widest small fw-bold mb-2 d-block">
-            <i class="bi bi-gem me-2"></i>Chế tác tinh xảo - Tỏa sáng quý phái
-        </span>
-        <h1 class="display-4 fw-bold text-white mb-3 font-monospace tracking-wide">ALICE SHOP</h1>
-        <p class="lead fw-normal text-secondary mx-auto mb-4" style="max-width: 600px; font-size: 1.1rem;">
-            Khám phá bộ sưu tập trang sức, phụ kiện đá quý chế tác độc quyền. Đồng hành cùng vẻ đẹp tự tin, khí chất kiêu sa của phụ nữ Việt.
-        </p>
-        <a class="btn btn-warning btn-lg px-4 py-2.5 text-dark fw-bold shadow transition-all rounded-pill hover-scale" asp-controller="Product" asp-action="Collection">
-            Khám phá bộ sưu tập <i class="bi bi-arrow-right ms-1"></i>
-        </a>
+<section class="relative min-h-[600px] flex items-center justify-center overflow-hidden mb-20 animate-fadeIn bg-surface-container-low">
+    <div class="absolute inset-0 bg-no-repeat bg-center bg-cover transition-transform duration-[10000ms] hover:scale-105"
+         style="background-image: linear-gradient(to right, rgba(26, 28, 27, 0.85), rgba(26, 28, 27, 0.4)), url('https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1600');">
     </div>
+
+    <div class="max-w-[1440px] w-full mx-auto px-6 md:px-20 relative z-10 text-white space-y-6">
+        <div class="max-w-2xl flex flex-col gap-4">
+            <span class="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
+                ✨ Chế tác thủ công — Khí chất vĩnh cửu
+            </span>
+            <h1 class="font-serif text-4xl md:text-6xl font-medium tracking-wide uppercase leading-tight m-0">
+                Alice Store
+            </h1>
+            <p class="font-sans text-sm md:text-base text-white/70 leading-relaxed text-justify max-w-lg m-0 font-medium">
+                Khám phá kiệt tác bộ sưu tập trang sức, phụ kiện đá quý cao cấp được mài giũa thủ công nghiêm ngặt. Đồng hành cùng vẻ đẹp độc bản và khí chất kiêu sa vượt thời gian.
+            </p>
+            <div class="pt-4">
+                <a class="inline-flex items-center justify-center px-8 h-12 bg-white text-on-surface font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-primary hover:text-white transition-all duration-300 no-underline shadow-md"
+                   asp-controller="Product" asp-action="Collection">
+                    Khám phá bộ sưu tập <span class="material-symbols-outlined text-sm ml-2">arrow_right_alt</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="max-w-[1440px] mx-auto px-6 md:px-20 pb-24">
+
+    <section class="mb-24">
+        <div class="text-center mb-12 space-y-1">
+            <h2 class="font-serif text-2xl md:text-3xl font-medium text-on-background uppercase tracking-wide m-0">
+                Danh Mục Nổi Bật
+            </h2>
+            <p class="text-xs text-on-surface-variant font-medium uppercase tracking-widest">
+                Tìm kiếm nhanh theo từng nhóm phụ kiện tinh tế
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div class="group relative bg-surface-container-low border border-outline-variant/20 rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-all duration-300 flex flex-col items-center gap-4">
+                <div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-white">
+                    <span class="material-symbols-outlined text-2xl">heart_luxury</span>
+                </div>
+                <h4 class="font-serif text-lg font-medium text-on-surface m-0 tracking-wide">Nhẫn Quý Phái</h4>
+                <a asp-controller="Product" asp-action="Collection" class="text-xs text-primary font-bold uppercase tracking-wider no-underline hover:opacity-80 transition-opacity">
+                    Xem ngay <span class="font-sans">→</span>
+                </a>
+            </div>
+
+            <div class="group relative bg-surface-container-low border border-outline-variant/20 rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-all duration-300 flex flex-col items-center gap-4">
+                <div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-white">
+                    <span class="material-symbols-outlined text-2xl">diamond</span>
+                </div>
+                <h4 class="font-serif text-lg font-medium text-on-surface m-0 tracking-wide">Dây Chuyền</h4>
+                <a asp-controller="Product" asp-action="Collection" class="text-xs text-primary font-bold uppercase tracking-wider no-underline hover:opacity-80 transition-opacity">
+                    Xem ngay <span class="font-sans">→</span>
+                </a>
+            </div>
+
+            <div class="group relative bg-surface-container-low border border-outline-variant/20 rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-all duration-300 flex flex-col items-center gap-4">
+                <div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-white">
+                    <span class="material-symbols-outlined text-2xl">all_inclusive</span>
+                </div>
+                <h4 class="font-serif text-lg font-medium text-on-surface m-0 tracking-wide">Vòng & Lắc Tay</h4>
+                <a asp-controller="Product" asp-action="Collection" class="text-xs text-primary font-bold uppercase tracking-wider no-underline hover:opacity-80 transition-opacity">
+                    Xem ngay <span class="font-sans">→</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-24">
+        <div class="text-center mb-12 space-y-1">
+            <h2 class="font-serif text-2xl md:text-3xl font-medium text-on-background uppercase tracking-wide m-0">
+                Tuyệt Tác Mới Nhất
+            </h2>
+            <p class="text-xs text-on-surface-variant font-medium uppercase tracking-widest">
+                Độ phản chiếu hoàn hảo — Kiệt tác từ nghệ nhân lành nghề
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var product in Model)
+                {
+                    var imgUrl = string.IsNullOrEmpty(product.ImageUrl) ? "/images/placeholder.png" : product.ImageUrl;
+
+                    <div class="group flex flex-col gap-3 relative bg-white border border-outline-variant/10 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
+                        <div class="aspect-[4/5] overflow-hidden bg-surface-container-low relative rounded-t-lg">
+                            <img src="@imgUrl" alt="@product.Name" class="w-full h-full object-cover transition-transform duration-750 group-hover:scale-105" />
+                            <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id" class="absolute inset-0 bg-on-surface/5 opacity-0 group-hover:opacity-100 transition-opacity"></a>
+                        </div>
+
+                        <div class="px-4 pb-4 pt-1 flex flex-col flex-grow gap-1.5">
+                            <span class="text-[10px] font-bold text-primary uppercase tracking-widest">
+                                @(product.Category?.Name ?? "Trang sức")
+                            </span>
+                            <h3 class="font-serif text-sm md:text-base font-medium text-on-background uppercase tracking-wide line-clamp-1 m-0">
+                                <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id" class="text-current no-underline hover:text-primary transition-colors">
+                                    @product.Name
+                                </a>
+                            </h3>
+                            <p class="font-sans text-sm font-bold text-primary m-0">
+                                @string.Format("{0:N0} ₫", product.Price)
+                            </p>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-span-4 py-16 text-center text-sm italic text-on-surface-variant/70 border border-dashed rounded-xl">
+                    Hệ thống đang cập nhật các tuyệt tác mới. Vui lòng quay lại sau.
+                </div>
+            }
+        </div>
+    </section>
+
+    <div class="border-t border-outline-variant/20 mb-20"></div>
+
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center max-w-5xl mx-auto">
+        <div class="flex flex-col items-center gap-3 px-4">
+            <span class="material-symbols-outlined text-primary text-4xl">verified</span>
+            <h5 class="font-serif text-base font-semibold text-on-background uppercase tracking-wider m-0">Cam Kết Chính Hãng</h5>
+            <p class="text-on-surface-variant text-xs leading-relaxed text-justify sm:text-center m-0 font-medium">
+                Mọi tác phẩm bàn giao đều đạt chứng nhận định danh tuổi vàng quốc tế, minh bạch nguồn gốc và hóa đơn kiểm định.
+            </p>
+        </div>
+
+        <div class="flex flex-col items-center gap-3 px-4">
+            <span class="material-symbols-outlined text-primary text-4xl">workspace_premium</span>
+            <h5 class="font-serif text-base font-semibold text-on-background uppercase tracking-wider m-0">Chế Tác Thủ Công</h5>
+            <p class="text-on-surface-variant text-xs leading-relaxed text-justify sm:text-center m-0 font-medium">
+                Kiểu dáng dẫn đầu xu hướng trang sức đương đại, được mài giũa tỉ mỉ hàng trăm giờ bởi nghệ nhân kim hoàn lành nghề.
+            </p>
+        </div>
+
+        <div class="flex flex-col items-center gap-3 px-4">
+            <span class="material-symbols-outlined text-primary text-4xl">potted_plant</span>
+            <h5 class="font-serif text-base font-semibold text-on-background uppercase tracking-wider m-0">Bảo Hành Trọn Đời</h5>
+            <p class="text-on-surface-variant text-xs leading-relaxed text-justify sm:text-center m-0 font-medium">
+                Đặc quyền miễn phí trọn đời dịch vụ siêu âm làm sạch bề mặt, đánh bóng gương và kiểm tra độ bám chấu đá quý định kỳ.
+            </p>
+        </div>
+    </section>
 </div>
-
-<div class="container">
-    <div class="text-center mb-5">
-        <h2 class="fw-bold text-dark position-relative d-inline-block pb-2 mb-2">
-            Danh Mục Nổi Bật
-        </h2>
-        <p class="text-muted small">Tìm kiếm nhanh theo từng nhóm phụ kiện tinh tế</p>
-    </div>
-
-    <div class="row g-4 justify-content-center mb-5">
-        <div class="col-6 col-md-3">
-            <div class="card h-100 border-0 shadow-sm text-center bg-white rounded-3 overflow-hidden p-3 hover-shadow transition-all">
-                <div class="d-flex align-items-center justify-content-center bg-warning bg-opacity-10 text-warning rounded-circle mx-auto mb-3" style="width: 70px; height: 70px;">
-                    <i class="bi bi-heart-fill fs-3"></i>
-                </div>
-                <h5 class="fw-bold text-dark mb-2">Nhẫn Quý Phái</h5>
-                <a asp-controller="Product" asp-action="Index" class="small text-warning text-decoration-none fw-semibold">Xem ngay →</a>
-            </div>
-        </div>
-
-        <div class="col-6 col-md-3">
-            <div class="card h-100 border-0 shadow-sm text-center bg-white rounded-3 overflow-hidden p-3 hover-shadow transition-all">
-                <div class="d-flex align-items-center justify-content-center bg-warning bg-opacity-10 text-warning rounded-circle mx-auto mb-3" style="width: 70px; height: 70px;">
-                    <i class="bi bi-gem fs-3"></i>
-                </div>
-                <h5 class="fw-bold text-dark mb-2">Dây Chuyền</h5>
-                <a asp-controller="Product" asp-action="Index" class="small text-warning text-decoration-none fw-semibold">Xem ngay →</a>
-            </div>
-        </div>
-
-        <div class="col-6 col-md-3">
-            <div class="card h-100 border-0 shadow-sm text-center bg-white rounded-3 overflow-hidden p-3 hover-shadow transition-all">
-                <div class="d-flex align-items-center justify-content-center bg-warning bg-opacity-10 text-warning rounded-circle mx-auto mb-3" style="width: 70px; height: 70px;">
-                    <i class="bi bi-activity fs-3"></i>
-                </div>
-                <h5 class="fw-bold text-dark mb-2">Vòng & Lắc Tay</h5>
-                <a asp-controller="Product" asp-action="Index" class="small text-warning text-decoration-none fw-semibold">Xem ngay →</a>
-            </div>
-        </div>
-    </div>
-
-    <hr class="opacity-10 my-5" />
-
-    <div class="row g-4 py-3 text-center">
-        <div class="col-md-4">
-            <div class="p-3">
-                <i class="bi bi-shield-check text-warning fs-1 mb-2 d-block"></i>
-                <h5 class="fw-bold text-dark">Cam Kết Chính Hãng</h5>
-                <p class="text-secondary small px-lg-4">Mọi sản phẩm bán ra đều đạt chứng nhận tuổi vàng chuẩn quốc tế, minh bạch hóa đơn.</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="p-3">
-                <i class="bi bi-stars text-warning fs-1 mb-2 d-block"></i>
-                <h5 class="fw-bold text-dark">Chế Tác Độc Quyền</h5>
-                <p class="text-secondary small px-lg-4">Mẫu mã đi đầu xu hướng thời trang, được mài giũa thủ công tỉ mỉ bởi nghệ nhân lành nghề.</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="p-3">
-                <i class="bi bi-arrow-counterclockwise text-warning fs-1 mb-2 d-block"></i>
-                <h5 class="fw-bold text-dark">Bảo Hành Trọn Đời</h5>
-                <p class="text-secondary small px-lg-4">Miễn phí dịch vụ siêu âm làm sạch, đánh bóng và tân trang định kỳ trọn đời sản phẩm.</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-    .tracking-widest {
-        letter-spacing: 3px;
-    }
-
-    .tracking-wide {
-        letter-spacing: 1px;
-    }
-
-    .transition-all {
-        transition: all 0.3s ease-in-out;
-    }
-
-    /* Hiệu ứng phóng to nhẹ khi di chuột vào nút */
-    .hover-scale:hover {
-        transform: scale(1.03);
-        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4) !important;
-    }
-
-    /* Hiệu ứng bóng đổ và nâng nhẹ card danh mục khi đưa chuột qua */
-    .hover-shadow:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
-    }
-</style>

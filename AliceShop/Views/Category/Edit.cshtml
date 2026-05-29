@@ -4,53 +4,37 @@
     ViewData["Title"] = "Chỉnh sửa danh mục";
 }
 
-<div class="container py-4">
-    <div class="mb-4">
-        <a asp-action="Index" class="text-secondary text-decoration-none small hover-text-warning">
-            <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
-        </a>
+<main class="pt-12 pb-20 max-w-[1440px] mx-auto px-6 md:px-20 animate-fadeIn">
+    <header class="mb-12">
+        <span class="text-xs font-bold text-primary uppercase tracking-widest block mb-1">Chế độ quản trị viên</span>
+        <h1 class="font-serif text-3xl md:text-4xl text-on-surface mb-2 font-medium tracking-wide">Chỉnh sửa danh mục</h1>
+        <p class="text-secondary font-sans text-sm">Cập nhật tên gọi nhóm phân loại phân khúc trang sức cao cấp cho mã số #@Model.Id.</p>
+    </header>
+
+    <div class="max-w-2xl bg-surface-container-low p-8 md:p-10 rounded-lg border border-outline-variant/20 shadow-sm">
+        <form asp-action="Edit" method="post" autocomplete="off" class="space-y-8">
+            <div asp-validation-summary="ModelOnly" class="text-sm text-red-600 bg-red-50 p-3 rounded border border-red-200 hidden"></div>
+            <input type="hidden" asp-for="Id" />
+
+            <div class="space-y-2">
+                <label asp-for="Name" class="font-semibold text-xs uppercase tracking-widest text-on-surface-variant block mb-1">
+                    Tên danh mục phân loại <span class="text-red-600">*</span>
+                </label>
+                <input asp-for="Name" class="w-full input-underline py-3 px-0 text-lg font-serif text-on-surface bg-transparent focus:ring-0 focus:outline-none" placeholder="Ví dụ: Dây chuyền, Nhẫn kim cương, Vòng tay..." required />
+                <span asp-validation-for="Name" class="text-red-600 text-xs font-semibold mt-1 block"></span>
+            </div>
+
+            <div class="pt-6 flex flex-col sm:flex-row gap-4 items-center">
+                <button type="submit" class="w-full sm:w-auto px-12 py-4 bg-on-background text-white font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-primary transition-colors shadow-sm cursor-pointer outline-none">
+                    Lưu Thay Đổi
+                </button>
+                <a asp-action="Index" class="w-full sm:w-auto px-12 py-4 border border-outline text-on-surface font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-surface-container text-center no-underline transition-colors flex items-center justify-center">
+                    Hủy Cập Nhật
+                </a>
+            </div>
+        </form>
     </div>
-
-    <div class="card border-0 shadow-sm rounded-3 overflow-hidden bg-white mx-auto" style="max-width: 600px;">
-        <div class="card-header bg-dark text-light py-3 px-4 border-bottom border-warning border-opacity-25">
-            <h5 class="mb-0 fw-bold tracking-widest text-warning text-uppercase">
-                <i class="bi bi-pencil-square me-2"></i>Thay đổi tên danh mục
-            </h5>
-        </div>
-
-        <div class="card-body p-4 p-md-5">
-            <form asp-action="Edit">
-                <input type="hidden" asp-for="Id" />
-
-                <div class="form-group mb-4">
-                    <label asp-for="Name" class="form-label fw-bold text-secondary small text-uppercase">Tên danh mục mới <span class="text-danger">*</span></label>
-                    <input asp-for="Name" class="form-control form-control-lg border-2" required />
-                    <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
-                </div>
-
-                <div class="pt-3 border-top d-flex gap-2 justify-content-end">
-                    <a asp-action="Index" class="btn btn-outline-secondary px-4">Hủy bỏ</a>
-                    <button type="submit" class="btn btn-warning px-4 text-dark fw-bold shadow-sm">Cập nhật</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<style>
-    .tracking-widest {
-        letter-spacing: 1px;
-    }
-
-    .form-control:focus {
-        border-color: #ffc107 !important;
-        box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.15) !important;
-    }
-
-    .hover-text-warning:hover {
-        color: #ffc107 !important;
-    }
-</style>
+</main>
 
 @section Scripts {
     @{

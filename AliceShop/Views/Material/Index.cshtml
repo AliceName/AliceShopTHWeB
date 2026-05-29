@@ -1,7 +1,7 @@
-﻿@model IEnumerable<AliceShop.Models.Category>
+﻿@model IEnumerable<AliceShop.Models.Material>
 
 @{
-    ViewData["Title"] = "Quản lý danh mục";
+    ViewData["Title"] = "Quản lý chất liệu";
 }
 
 <div class="max-w-[1440px] mx-auto px-6 md:px-20 py-10 animate-fadeIn">
@@ -9,11 +9,11 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-12">
         <div>
             <span class="text-xs font-bold text-primary uppercase tracking-widest block mb-1">Bảng điều khiển Admin</span>
-            <h1 class="font-serif text-3xl font-medium text-on-background">Quản lý danh mục</h1>
-            <p class="text-on-surface-variant text-sm mt-1">Danh sách nhóm phân loại bộ sưu tập trang sức — Đồng bộ thời gian thực với SQL Server</p>
+            <h1 class="font-serif text-3xl font-medium text-on-background">Quản lý chất liệu</h1>
+            <p class="text-on-surface-variant text-sm mt-1">Danh sách nguyên liệu chế tác cao cấp — Đồng bộ thời gian thực với SQL Server</p>
         </div>
         <a asp-action="Create" class="inline-flex items-center gap-2 bg-primary text-white font-semibold text-xs uppercase tracking-widest px-6 py-3.5 rounded-md hover:bg-opacity-90 transition-all duration-300 no-underline shadow-sm">
-            <span class="material-symbols-outlined text-sm">add</span> Thêm danh mục mới
+            <span class="material-symbols-outlined text-sm">add</span> Thêm chất liệu mới
         </a>
     </div>
 
@@ -23,7 +23,7 @@
                 <thead>
                     <tr class="bg-surface-container-low border-b border-outline-variant/30 text-on-surface-variant font-semibold text-xs uppercase tracking-widest">
                         <th class="py-4 px-6 font-semibold w-24">Mã ID</th>
-                        <th class="py-4 px-6 font-semibold">Tên danh mục phân loại</th>
+                        <th class="py-4 px-6 font-semibold">Tên chất liệu / Nguyên liệu quý</th>
                         <th class="py-4 px-6 font-semibold text-right w-48">Thao tác</th>
                     </tr>
                 </thead>
@@ -36,7 +36,7 @@
                             </td>
                             <td class="py-4 px-6">
                                 <div class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-primary text-lg">auto_awesome_motion</span>
+                                    <span class="material-symbols-outlined text-primary text-lg">diamond</span>
                                     <span class="font-serif font-medium text-base tracking-wide text-on-background">@item.Name</span>
                                 </div>
                             </td>
@@ -60,7 +60,7 @@
     @if (!Model.Any())
     {
         <div class="py-24 text-center text-on-surface-variant/60 italic text-sm border border-dashed rounded-xl border-outline-variant/50 mt-6 bg-white/50">
-            <span class="material-symbols-outlined text-4xl block mb-3 text-outline-variant">folder_off</span>Hiện không có danh mục nào được tìm thấy.
+            <span class="material-symbols-outlined text-4xl block mb-3 text-outline-variant">layers_clear</span>Hiện không có chất liệu nào trong cơ sở dữ liệu.
         </div>
     }
 </div>

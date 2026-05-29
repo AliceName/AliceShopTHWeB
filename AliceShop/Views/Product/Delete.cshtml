@@ -2,141 +2,73 @@
 
 @{
     ViewData["Title"] = "Xác nhận xóa sản phẩm";
-
-    // 1. XỬ LÝ LỌC ẢNH CHÍNH XÁC: Lấy ảnh đầu tiên trong mảng ImageUrls mới để tránh lỗi vỡ ảnh
-    var mainImageUrl = "/images/placeholder.png";
-    if (Model.ImageUrls != null && Model.ImageUrls.Any())
-    {
-        mainImageUrl = Model.ImageUrls.First();
-    }
-    else if (!string.IsNullOrEmpty(Model.ImageUrl))
-    {
-        mainImageUrl = Model.ImageUrl;
-    }
-
-    // Tự động thêm dấu "/" nếu thiếu đối với các file ảnh cục bộ
-    if (!mainImageUrl.StartsWith("/") && !mainImageUrl.StartsWith("http://") && !mainImageUrl.StartsWith("https://"))
-    {
-        mainImageUrl = "/" + mainImageUrl;
-    }
-
-    // 2. CHUẨN HÓA DANH MỤC: Đọc danh sách từ Controller truyền sang để map tên chữ công cộng
-    var categories = ViewBag.CategoriesList as IEnumerable<AliceShop.Models.Category> ?? new List<AliceShop.Models.Category>();
-    var categoryName = categories.FirstOrDefault(c => c.Id == Model.CategoryId)?.Name ?? $"Mã số: {Model.CategoryId}";
+    var mainImgUrl = string.IsNullOrEmpty(Model?.ImageUrl) ? "/images/placeholder.png" : Model.ImageUrl;
 }
 
-<div class="container py-4">
-    <div class="mb-4">
-        <a asp-action="Index" class="text-secondary text-decoration-none small hover-text-warning">
-            <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách quản lý
-        </a>
-    </div>
+<main class="pt-12 pb-20 max-w-[1440px] mx-auto px-6 md:px-20 animate-fadeIn">
+    <header class="mb-12 border-b border-error/20 pb-6">
+        <span class="text-xs font-bold text-error uppercase tracking-widest block mb-1">Cảnh báo hành động hệ thống</span>
+        <h1 class="font-serif text-3xl md:text-4xl text-on-surface mb-2 font-medium tracking-wide">Xác nhận gỡ bỏ tác phẩm?</h1>
+        <p class="text-secondary font-sans text-sm">Hành động này không thể hoàn tác. Toàn bộ hình ảnh và dữ liệu liên quan trong SQL Server sẽ bị xóa sạch.</p>
+    </header>
 
-    <div class="card border-0 shadow-sm rounded-3 overflow-hidden bg-white mx-auto" style="max-width: 850px;">
-        <div class="card-header bg-danger text-light py-3 px-4 border-bottom border-danger border-opacity-25">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold tracking-widest text-white text-uppercase">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Cảnh báo: Xác nhận xóa sản phẩm?
-                </h5>
-                <span class="badge bg-black bg-opacity-25">Mã định danh: #@Model.Id</span>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+
+        <div class="lg:col-span-4 bg-surface-container-low p-6 rounded-lg border border-outline-variant/20 shadow-sm">
+            <label class="font-semibold text-xs uppercase tracking-widest mb-4 block text-on-surface-variant">Hình ảnh tác phẩm</label>
+            <div class="aspect-[4/5] w-full rounded-md overflow-hidden bg-white border border-outline-variant/20 shadow-sm">
+                <img src="@mainImgUrl" alt="@Model?.Name" class="w-full h-full object-cover" />
+            </div>
+            <div class="mt-4 bg-error/5 border border-error/10 p-3 rounded text-center">
+                <span class="text-xs font-mono font-bold text-error">MÃ TÁC PHẨM: #@Model?.Id</span>
             </div>
         </div>
 
-        <div class="card-body p-4 p-md-5">
-            <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
-                <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+        <div class="lg:col-span-8 space-y-8">
+            <div class="bg-surface-container-low p-8 rounded-lg border border-outline-variant/20 shadow-sm space-y-6">
+
                 <div>
-                    Hành động này <strong>không thể hoàn tác</strong>. Dữ liệu trang sức, hình ảnh và thông tin liên quan đến sản phẩm này sẽ bị xóa vĩnh viễn khỏi hệ thống bộ nhớ tạm của AliceShop.
+                    <span class="font-semibold text-xs uppercase tracking-widest text-on-surface-variant block mb-1">Tên tác phẩm</span>
+                    <h2 class="font-serif text-2xl font-medium text-on-surface uppercase tracking-wide m-0">@Model?.Name</h2>
                 </div>
-            </div>
 
-            <div class="row g-4 align-items-center">
-                <div class="col-md-4 text-center">
-                    <div class="rounded-3 bg-light border p-3 d-flex align-items-center justify-content-center overflow-hidden ratio ratio-1x1 mx-auto shadow-sm" style="max-width: 250px;">
-                        <img src="@mainImageUrl" class="w-100 h-100 object-fit-cover rounded grayscale-hover" alt="@Model.Name" />
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-outline-variant/20">
+                    <div>
+                        <span class="font-semibold text-xs uppercase tracking-widest text-on-surface-variant block mb-1">Danh mục nhóm</span>
+                        <span class="inline-block bg-surface-container-high px-3 py-1.5 rounded text-sm font-bold text-secondary border border-outline-variant/20">
+                            ✨ @(Model?.Category?.Name ?? "Trang sức")
+                        </span>
+                    </div>
+                    <div>
+                        <span class="font-semibold text-xs uppercase tracking-widest text-on-surface-variant block mb-1">Chất liệu chế tác</span>
+                        <span class="inline-block bg-surface-container-high px-3 py-1.5 rounded text-sm font-bold text-secondary border border-outline-variant/20">
+                            💎 @(Model?.Material?.Name ?? "Cao cấp")
+                        </span>
                     </div>
                 </div>
 
-                <div class="col-md-8">
-                    <div class="table-responsive border rounded-3 bg-light bg-opacity-25">
-                        <table class="table table-borderless align-middle mb-0">
-                            <tbody>
-                                <tr class="border-bottom border-light">
-                                    <td class="fw-bold text-secondary ps-3 py-2.5" style="width: 200px;">Tên trang sức:</td>
-                                    <td class="text-dark fw-bold text-uppercase">@Html.DisplayFor(model => model.Name)</td>
-                                </tr>
-                                <tr class="border-bottom border-light">
-                                    <td class="fw-bold text-secondary ps-3 py-2.5">Nhóm danh mục:</td>
-                                    <td>
-                                        <span class="badge bg-dark text-warning px-2.5 py-1.5 rounded-pill fs-7 fw-semibold shadow-sm">
-                                            <i class="bi bi-tag-fill me-1 small"></i> @categoryName
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr class="border-bottom border-light">
-                                    <td class="fw-bold text-secondary ps-3 py-2.5">Giá niêm yết:</td>
-                                    <td class="text-danger fw-bold fs-5">@string.Format("{0:N0} đ", Model.Price)</td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold text-secondary ps-3 py-2.5 align-top pt-2">Mô tả tóm tắt:</td>
-                                    <td class="text-muted small text-truncate-2 lh-base" style="text-align: justify; padding-right: 15px;">
-                                        @Html.DisplayFor(model => model.Description)
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="pt-4 border-t border-outline-variant/20">
+                    <span class="font-semibold text-xs uppercase tracking-widest text-on-surface-variant block mb-1">Giá trị niêm yết</span>
+                    <p class="font-sans text-xl font-bold text-primary m-0">@string.Format("{0:N0} ₫", Model?.Price)</p>
+                </div>
+
+                <div class="pt-4 border-t border-outline-variant/20">
+                    <span class="font-semibold text-xs uppercase tracking-widest text-on-surface-variant block mb-1">Thông số / Mô tả câu chuyện</span>
+                    <p class="text-on-surface-variant text-sm leading-relaxed text-justify m-0 font-medium">@Model?.Description</p>
                 </div>
             </div>
 
-            <div class="mt-5 pt-3 border-top d-flex gap-2 justify-content-end">
-                <form asp-action="Delete" method="post" class="d-flex gap-2 w-100 justify-content-end">
-                    <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2">
-                        Hủy bỏ, quay lại
-                    </a>
-                    <button type="submit" class="btn btn-danger px-4 py-2 fw-bold shadow-sm">
-                        <i class="bi bi-trash3-fill me-1"></i> Xác nhận xóa hẳn
-                    </button>
-                </form>
-            </div>
+            <form asp-action="Delete" class="pt-4 flex flex-col sm:flex-row gap-4 items-center">
+                <input type="hidden" asp-for="Id" />
 
+                <button type="submit" class="w-full sm:w-auto px-12 py-4 text-white font-semibold text-xs uppercase tracking-widest rounded-md transition-all duration-300 flex items-center justify-center gap-2 shadow-sm cursor-pointer" style="background-color: #ba1a1a;">
+                    <span class="material-symbols-outlined text-sm">delete_forever</span> Xác Nhận Xóa Vĩnh Viễn
+                </button>
+
+                <a asp-action="Index" class="w-full sm:w-auto px-12 py-4 border border-outline text-on-surface font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-surface-container text-center no-underline transition-colors">
+                    Hủy Bỏ & Quay Lại
+                </a>
+            </form>
         </div>
     </div>
-</div>
-
-<style>
-    .tracking-widest {
-        letter-spacing: 1px;
-    }
-
-    .object-fit-cover {
-        object-fit: cover;
-    }
-
-    .hover-text-warning:hover {
-        color: #ffc107 !important;
-    }
-
-    .fs-7 {
-        font-size: 0.8rem;
-    }
-
-    /* Tạo hiệu ứng mờ nhẹ cho ảnh sản phẩm sắp bị xóa */
-    .grayscale-hover {
-        filter: grayscale(20%);
-        transition: filter 0.2s ease-in-out;
-    }
-
-        .grayscale-hover:hover {
-            filter: grayscale(0%);
-        }
-
-    /* Giới hạn text mô tả trong 2 dòng cho gọn form xóa */
-    .text-truncate-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        white-space: normal;
-    }
-</style>
+</main>

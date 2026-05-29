@@ -2,6 +2,7 @@
 using AliceShop.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace AliceShop.Controllers
 {
@@ -9,241 +10,239 @@ namespace AliceShop.Controllers
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IMaterialRepository _materialRepository;
+        private readonly IWebHostEnvironment _env;
 
-        public ProductController(IProductRepository productRepository, ICategoryRepository categoryRepository)
+        public ProductController(
+            IProductRepository productRepository,
+            ICategoryRepository categoryRepository,
+            IMaterialRepository materialRepository,
+            IWebHostEnvironment env)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
+            _materialRepository = materialRepository;
+            _env = env;
         }
 
-        // 1. Đồng bộ danh sách sản phẩm
-        public IActionResult Index()
+        // ── 1. Index (Quản lý dạng Card thời thượng của Admin) ──────────────
+        public async Task<IActionResult> Index()
         {
-            var products = _productRepository.GetAll();
-            ViewBag.CategoriesList = _categoryRepository.GetAllCategories();
+            var products = await _productRepository.GetAllAsync();
+            ViewBag.CategoriesList = await _categoryRepository.GetAllAsync();
             return View(products);
         }
 
-        // 1b. GIAO DIỆN BỘ SƯU TẬP (Dành cho Khách hàng) - Chuyển sang dạng GRID CARDS
-        public IActionResult Collection()
+        // ── 1b. Collection (Bộ sưu tập dạng Grid phía Khách hàng kết hợp tìm kiếm) ──
+        public async Task<IActionResult> Collection(string? q)
         {
-            var products = _productRepository.GetAll();
-            ViewBag.CategoriesList = _categoryRepository.GetAllCategories();
-            return View(products); // Sẽ nạp file Views/Product/Collection.cshtml (Dạng Grid)
-        }
+            IEnumerable<Product> products;
 
-        // 2. Chi tiết sản phẩm
-        public IActionResult Details(int id)
-        {
-            var product = _productRepository.GetById(id);
-            if (product == null)
+            if (!string.IsNullOrEmpty(q))
             {
-                return NotFound();
+                products = await _productRepository.SearchByNameAsync(q.Trim());
+                ViewBag.SearchKeyword = q;
             }
-            ViewBag.CategoriesList = _categoryRepository.GetAllCategories();
-            return View(product);
+            else
+            {
+                products = await _productRepository.GetAllAsync();
+            }
+
+            ViewBag.CategoriesList = await _categoryRepository.GetAllAsync();
+            return View(products);
         }
 
-        // 3. Giao diện thêm sản phẩm
-        public IActionResult Create()
+        // ── 2. Create (GET) ────────────────────────────────────────────────
+        public async Task<IActionResult> Create()
         {
-            LoadCategoriesToViewBag();
+            await LoadDropdownsAsync();
             return View();
         }
 
+        // ── 2. Create (POST) ───────────────────────────────────────────────
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Price,Description,CategoryId")] Product product, IFormFile imageUrl, List<IFormFile> imageUrls)
+        public async Task<IActionResult> Create([Bind("Name,Price,Description,CategoryId,MaterialId")] Product product, IFormFile? imageUrl, List<IFormFile>? imageFiles)
         {
-            product.ImageUrls = new List<string>();
-
-            // Xử lý lưu hình ảnh đại diện chính
-            if (imageUrl != null && imageUrl.Length > 0)
-            {
-                product.ImageUrl = await SaveImage(imageUrl);
-            }
-            else
-            {
-                // Vá lỗi: Gán ảnh placeholder nếu Admin không chọn ảnh đại diện
-                product.ImageUrl = "/images/placeholder.png";
-            }
-
-            // Xử lý lưu album ảnh phụ chi tiết
-            if (imageUrls != null && imageUrls.Any(f => f.Length > 0))
-            {
-                foreach (var file in imageUrls)
-                {
-                    if (file.Length > 0)
-                    {
-                        product.ImageUrls.Add(await SaveImage(file));
-                    }
-                }
-            }
-            else
-            {
-                // Đồng bộ mảng phụ cũng có ít nhất 1 ảnh hiển thị ở trang Details
-                product.ImageUrls.Add(product.ImageUrl);
-            }
-            // ════ 3. ĐỒNG BỘ: ĐẢM BẢO ẢNH CHÍNH LUÔN NẰM TRONG DANH SÁCH ẢNH PHỤ ════
-            if (!string.IsNullOrEmpty(product.ImageUrl))
-            {
-                // Nếu trong danh sách ảnh phụ chưa có đường dẫn của ảnh chính hiện tại
-                if (!product.ImageUrls.Contains(product.ImageUrl))
-                {
-                    // Chèn ảnh chính vào ngay vị trí đầu tiên (Index 0) của bộ sưu tập ảnh phụ
-                    product.ImageUrls.Insert(0, product.ImageUrl);
-                }
-            }
-
-            if (ModelState.IsValid)
-            {
-                _productRepository.Add(product);
-                return RedirectToAction(nameof(Index));
-            }
-
-            LoadCategoriesToViewBag();
-            return View(product);
-        }
-
-        // 4. Giao diện cập nhật sản phẩm
-        public IActionResult Edit(int id)
-        {
-            var product = _productRepository.GetById(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            LoadCategoriesToViewBag();
-            return View(product);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Price,Description,CategoryId")] Product product, IFormFile imageUrl, List<IFormFile> imageUrls)
-        {
-            if (id != product.Id)
-            {
-                return BadRequest();
-            }
-
-            // 1. Lấy sản phẩm gốc từ RAM để chuẩn bị sao chép dữ liệu ảnh
-            var existingProduct = _productRepository.GetById(id);
-            if (existingProduct == null)
-            {
-                return NotFound();
-            }
-
-            // Khởi tạo danh sách mới tinh để bẻ gãy tham chiếu vùng nhớ cũ (Tránh lỗi gán đè RAM)
-            product.ImageUrls = new List<string>();
-
-            // 2. XỬ LÝ ẢNH ĐẠI DIỆN CHÍNH
-            if (imageUrl != null && imageUrl.Length > 0)
-            {
-                product.ImageUrl = await SaveImage(imageUrl);
-            }
-            else
-            {
-                product.ImageUrl = existingProduct.ImageUrl;
-            }
-
-            // 3. XỬ LÝ ALBUM ẢNH PHỤ
-            if (imageUrls != null && imageUrls.Any(f => f.Length > 0))
-            {
-                foreach (var file in imageUrls)
-                {
-                    if (file.Length > 0)
-                    {
-                        product.ImageUrls.Add(await SaveImage(file));
-                    }
-                }
-            }
-            else
-            {
-                // QUAN TRỌNG: Tạo bản sao danh sách mới (.ToList()) thay vì gán bằng trực tiếp để tránh lỗi tham chiếu RAM
-                if (existingProduct.ImageUrls != null)
-                {
-                    product.ImageUrls = existingProduct.ImageUrls.ToList();
-                }
-            }
-            // ════ 3. ĐỒNG BỘ: ĐẢM BẢO ẢNH CHÍNH LUÔN NẰM TRONG DANH SÁCH ẢNH PHỤ ════
-            if (!string.IsNullOrEmpty(product.ImageUrl))
-            {
-                // Nếu trong danh sách ảnh phụ chưa có đường dẫn của ảnh chính hiện tại
-                if (!product.ImageUrls.Contains(product.ImageUrl))
-                {
-                    // Chèn ảnh chính vào ngay vị trí đầu tiên (Index 0) của bộ sưu tập ảnh phụ
-                    product.ImageUrls.Insert(0, product.ImageUrl);
-                }
-            }
-
-            // 4. SỬA LỖI CHÍ MẠNG: Ép trình duyệt xóa bỏ kiểm tra hợp lệ của 2 trường ảnh tĩnh
-            // Điều này đảm bảo ModelState luôn luôn hợp lệ (True) sau khi ta đã gán dữ liệu thủ công ở trên
-            ModelState.Remove("imageUrl");
-            ModelState.Remove("imageUrls");
+            // Loại bỏ các kiểm tra navigation phức hợp của EF Core để tránh lỗi ModelState không đáng có
             ModelState.Remove("ImageUrl");
-            ModelState.Remove("ImageUrls");
+            ModelState.Remove("Images");
+            ModelState.Remove("Category");
+            ModelState.Remove("Material");
 
-            // 5. TIẾN HÀNH LƯU THAY ĐỔI
             if (ModelState.IsValid)
             {
-                _productRepository.Update(product);
+                product.Images = new List<ProductImage>();
+
+                // 1. Xử lý lưu File ảnh đại diện chính (Khớp 100% với name="imageUrl" ở View)
+                if (imageUrl != null && imageUrl.Length > 0)
+                {
+                    product.ImageUrl = await SaveImage(imageUrl);
+                }
+                else
+                {
+                    // Nếu Admin không tải ảnh, gán ảnh tạm chống vỡ khung hình
+                    product.ImageUrl = "/images/placeholder.png";
+                }
+
+                // 2. Xử lý lưu danh sách tập hợp các ảnh góc chụp phụ con (ProductImage 1-N)
+                if (imageFiles != null && imageFiles.Count > 0)
+                {
+                    foreach (var file in imageFiles.Where(f => f.Length > 0))
+                    {
+                        var savedPath = await SaveImage(file);
+                        product.Images.Add(new ProductImage { Url = savedPath });
+                    }
+                }
+
+                await _productRepository.AddAsync(product);
                 return RedirectToAction(nameof(Index));
             }
 
-            // Nếu vẫn có lỗi giao diện khác (như trống tên), nạp lại danh mục để hiện form
-            LoadCategoriesToViewBag();
+            await LoadDropdownsAsync(product.CategoryId, product.MaterialId);
             return View(product);
         }
-        // Hàm bổ trợ lưu ảnh tập trung chuẩn mã hóa Guid
+
+        // ── 3. Details (Xem chi tiết sản phẩm) ─────────────────────────────
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var product = await _productRepository.GetByIdAsync(id.Value);
+            if (product == null) return NotFound();
+
+            return View(product);
+        }
+
+        // ── 4. Edit (GET) ──────────────────────────────────────────────────
+        public async Task<IActionResult> Edit(int id)
+        {
+            var product = await _productRepository.GetByIdAsync(id);
+            if (product == null) return NotFound();
+
+            await LoadDropdownsAsync(product.CategoryId, product.MaterialId);
+            return View(product);
+        }
+
+        // ── 4. Edit (POST) ─────────────────────────────────────────────────
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Price,Description,CategoryId,MaterialId")] Product product, List<IFormFile>? imageFiles, List<int>? removedImageIds)
+        {
+            if (id != product.Id) return NotFound();
+
+            ModelState.Remove("ImageUrl");
+            ModelState.Remove("Images");
+            ModelState.Remove("Category");
+            ModelState.Remove("Material");
+
+            if (ModelState.IsValid)
+            {
+                var existing = await _productRepository.GetByIdAsync(id);
+                if (existing == null) return NotFound();
+
+                existing.Name = product.Name;
+                existing.Price = product.Price;
+                existing.Description = product.Description;
+                existing.CategoryId = product.CategoryId;
+                existing.MaterialId = product.MaterialId;
+
+                // Xử lý loại bỏ ảnh phụ khi chọn xóa trên UI
+                if (removedImageIds != null && removedImageIds.Count > 0 && existing.Images != null)
+                {
+                    var imagesToRemove = existing.Images.Where(img => removedImageIds.Contains(img.Id)).ToList();
+                    foreach (var img in imagesToRemove)
+                    {
+                        var filePath = Path.Combine(_env.WebRootPath, img.Url.TrimStart('/'));
+                        if (System.IO.File.Exists(filePath) && img.Url != "/images/placeholder.png")
+                        {
+                            System.IO.File.Delete(filePath);
+                        }
+                        existing.Images.Remove(img);
+                    }
+
+                    if (imagesToRemove.Any(img => img.Url == existing.ImageUrl))
+                    {
+                        existing.ImageUrl = existing.Images.FirstOrDefault()?.Url ?? "/images/placeholder.png";
+                    }
+                }
+
+                // Tải lên thêm ảnh phụ mới
+                if (imageFiles != null && imageFiles.Count > 0)
+                {
+                    existing.Images ??= new List<ProductImage>();
+                    foreach (var file in imageFiles.Where(f => f.Length > 0))
+                    {
+                        var savedPath = await SaveImage(file);
+                        existing.ImageUrl = savedPath; // Đẩy tấm ảnh mới nhất làm ảnh chính đại diện
+                        existing.Images.Add(new ProductImage { Url = savedPath, ProductId = existing.Id });
+                    }
+                }
+
+                await _productRepository.UpdateAsync(existing);
+                return RedirectToAction(nameof(Index));
+            }
+
+            await LoadDropdownsAsync(product.CategoryId, product.MaterialId);
+            return View(product);
+        }
+
+        // ── 5. Delete (GET) ────────────────────────────────────────────────
+        public async Task<IActionResult> Delete(int id)
+        {
+            var product = await _productRepository.GetByIdAsync(id);
+            if (product == null) return NotFound();
+            return View(product);
+        }
+
+        // ── 5. Delete (POST) ───────────────────────────────────────────────
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var product = await _productRepository.GetByIdAsync(id);
+            if (product != null && product.Images != null)
+            {
+                foreach (var img in product.Images)
+                {
+                    var filePath = Path.Combine(_env.WebRootPath, img.Url.TrimStart('/'));
+                    if (System.IO.File.Exists(filePath) && img.Url != "/images/placeholder.png")
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                }
+            }
+
+            await _productRepository.DeleteAsync(id);
+            return RedirectToAction(nameof(Index));
+        }
+
+        // ── Helpers ────────────────────────────────────────────────────────
         private async Task<string> SaveImage(IFormFile image)
         {
-            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
-            if (!Directory.Exists(folderPath))
+            var ext = Path.GetExtension(image.FileName);
+            var fileName = Guid.NewGuid().ToString("N") + ext;
+            var folder = Path.Combine(_env.WebRootPath, "images", "products");
+
+            if (!Directory.Exists(folder))
             {
-                Directory.CreateDirectory(folderPath);
+                Directory.CreateDirectory(folder);
             }
 
-            var fileExtension = Path.GetExtension(image.FileName);
-            var fileName = Guid.NewGuid().ToString() + fileExtension;
-            var filePath = Path.Combine(folderPath, fileName);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await image.CopyToAsync(fileStream);
-            }
+            var fullPath = Path.Combine(folder, fileName);
+            await using var stream = new FileStream(fullPath, FileMode.Create);
+            await image.CopyToAsync(stream);
 
             return "/images/products/" + fileName;
         }
 
-        // 5. Giao diện xác nhận xóa
-        public IActionResult Delete(int id)
+        private async Task LoadDropdownsAsync(int? selectedCategoryId = null, int? selectedMaterialId = null)
         {
-            var product = _productRepository.GetById(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-            ViewBag.CategoriesList = _categoryRepository.GetAllCategories();
-            return View(product);
-        }
+            var categories = await _categoryRepository.GetAllAsync();
+            ViewBag.Categories = new SelectList(categories, "Id", "Name", selectedCategoryId);
 
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
-        {
-            var product = _productRepository.GetById(id);
-            if (product != null)
-            {
-                _productRepository.Delete(id);
-            }
-            return RedirectToAction(nameof(Index));
-        }
-
-        private void LoadCategoriesToViewBag()
-        {
-            var categories = _categoryRepository.GetAllCategories();
-            ViewBag.Categories = new SelectList(categories, "Id", "Name");
+            var materials = await _materialRepository.GetAllAsync();
+            ViewBag.Materials = new SelectList(materials, "Id", "Name", selectedMaterialId);
         }
     }
 }

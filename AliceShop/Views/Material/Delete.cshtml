@@ -1,20 +1,20 @@
-﻿@model AliceShop.Models.Category
+﻿@model AliceShop.Models.Material
 
 @{
-    ViewData["Title"] = "Xác nhận xóa danh mục";
+    ViewData["Title"] = "Xác nhận xóa chất liệu";
 }
 
 <main class="pt-12 pb-20 max-w-[1440px] mx-auto px-6 md:px-20 animate-fadeIn">
     <header class="mb-12 border-b border-error/20 pb-6">
         <span class="text-xs font-bold text-error uppercase tracking-widest block mb-1">Cảnh báo hành động hệ thống</span>
-        <h1 class="font-serif text-3xl md:text-4xl text-on-surface mb-2 font-medium tracking-wide">Xóa bỏ danh mục nhóm?</h1>
-        <p class="text-secondary font-sans text-sm">Hành động này sẽ gỡ bỏ vĩnh viễn phân loại danh mục này khỏi hệ thống cơ sở dữ liệu SQL Server.</p>
+        <h1 class="font-serif text-3xl md:text-4xl text-on-surface mb-2 font-medium tracking-wide">Xóa bỏ chất liệu chế tác?</h1>
+        <p class="text-secondary font-sans text-sm">Hành động này sẽ gỡ bỏ vĩnh viễn phân loại chất liệu này khỏi hệ thống cơ sở dữ liệu SQL Server.</p>
     </header>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
         <div class="lg:col-span-8 bg-surface-container-low p-8 rounded-lg border border-outline-variant/20 shadow-sm space-y-6">
             <div>
-                <span class="font-semibold text-xs uppercase tracking-widest text-on-surface-variant block mb-1">Tên danh mục phân loại</span>
+                <span class="font-semibold text-xs uppercase tracking-widest text-on-surface-variant block mb-1">Tên chất liệu / Nguyên liệu</span>
                 <h2 class="font-serif text-2xl font-medium text-on-surface uppercase tracking-wide m-0">@Model?.Name</h2>
             </div>
 
@@ -29,7 +29,7 @@
                     <span class="material-symbols-outlined text-base">warning</span> Lưu ý quan trọng
                 </h3>
                 <p class="text-xs text-on-surface-variant leading-relaxed text-justify m-0 font-medium">
-                    Việc xóa danh mục cha này yêu cầu hệ thống phải xử lý toàn bộ các sản phẩm con thuộc nhóm. Để tránh lỗi xung đột ràng buộc khóa ngoại (<span class="font-mono text-red-700">Foreign Key Constraint</span>) trong SQL Server, hãy chắc chắn bạn đã xử lý hoặc chuyển nhóm các sản phẩm liên quan trước khi thực hiện.
+                    Khi xác nhận xóa chất liệu này, hệ thống sẽ tự động thực hiện quy trình dọn rác quét sạch các tệp tin hình ảnh vật lý trong thư mục <code class="bg-surface-container px-1 py-0.5 rounded text-error font-mono font-bold">wwwroot</code> và xóa các sản phẩm liên quan đang mang chất liệu này để tránh lỗi xung đột ràng buộc dữ liệu.
                 </p>
             </div>
 
@@ -37,7 +37,7 @@
                 <input type="hidden" asp-for="Id" />
 
                 <button type="submit" class="w-full h-12 text-white font-semibold text-xs uppercase tracking-widest rounded-md transition-all duration-300 flex items-center justify-center gap-2 shadow-sm cursor-pointer border border-transparent outline-none hover:opacity-90" style="background-color: #ba1a1a;">
-                    <span class="material-symbols-outlined text-sm">delete_forever</span> Xóa danh mục
+                    <span class="material-symbols-outlined text-sm">delete_forever</span> Xóa chất liệu
                 </button>
 
                 <a asp-action="Index" class="w-full h-12 border border-outline text-on-surface font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-surface-container text-center no-underline transition-colors flex items-center justify-center">
