@@ -1,9 +1,16 @@
 ﻿using AliceShop.Models;
 using AliceShop.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace AliceShop.Controllers
+namespace AliceShop.Areas.Admin.Controllers
 {
+    [Area("Admin")] // 🔥 Định danh thuộc phân khu quản trị Admin Area
+    [Authorize(Roles = "Admin")] // 🔥 Khóa bảo mật: Chỉ tài khoản quyền Admin mới được phép thao tác
     public class MaterialController : Controller
     {
         private readonly IMaterialRepository _materialRepository;
@@ -17,25 +24,24 @@ namespace AliceShop.Controllers
             _env = env;
         }
 
-        // ── 1. Index: Giao diện quản lý danh sách chất liệu ─────────────────
+        // ── 1. Index: Giao diện quản lý danh sách chất liệu của Admin ──
         public async Task<IActionResult> Index()
         {
             var materials = await _materialRepository.GetAllAsync();
-            return View(materials); // Tìm file Views/Material/Index.cshtml
+            return View(materials); // Tìm file Areas/Admin/Views/Material/Index.cshtml
         }
 
-        // ── 2. Create (GET): Giao diện thêm chất liệu mới ──────────────────
+        // ── 2. Create (GET) ──
         public IActionResult Create()
         {
-            return View(); // Tìm file Views/Material/Create.cshtml
+            return View(); // Tìm file Areas/Admin/Views/Material/Create.cshtml
         }
 
-        // ── 2. Create (POST): Xử lý lưu chất liệu vào SQL Server ─────────────
+        // ── 2. Create (POST) ──
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name")] Material material)
         {
-            // Bỏ qua xác thực danh sách sản phẩm liên kết để tránh lỗi ModelState ngầm
             ModelState.Remove("Products");
 
             if (ModelState.IsValid)
@@ -47,25 +53,25 @@ namespace AliceShop.Controllers
             return View(material);
         }
 
-        // ── 3. Details: Xem thông tin chi tiết chất liệu ──────────────────
+        // ── 3. Details ──
         public async Task<IActionResult> Details(int id)
         {
             var material = await _materialRepository.GetByIdAsync(id);
             if (material == null) return NotFound();
 
-            return View(material); // Tìm file Views/Material/Details.cshtml
+            return View(material); // Tìm file Areas/Admin/Views/Material/Details.cshtml
         }
 
-        // ── 4. Edit (GET): Giao diện chỉnh sửa tên chất liệu ───────────────
+        // ── 4. Edit (GET) ──
         public async Task<IActionResult> Edit(int id)
         {
             var material = await _materialRepository.GetByIdAsync(id);
             if (material == null) return NotFound();
 
-            return View(material); // Tìm file Views/Material/Edit.cshtml
+            return View(material); // Tìm file Areas/Admin/Views/Material/Edit.cshtml
         }
 
-        // ── 4. Edit (POST): Xử lý lưu cập nhật ─────────────────────────────
+        // ── 4. Edit (POST) ──
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Material material)
@@ -87,21 +93,21 @@ namespace AliceShop.Controllers
             return View(material);
         }
 
-        // ── 5. Delete (GET): Giao diện cảnh báo xác nhận xóa chất liệu ─────
+        // ── 5. Delete (GET) ──
         public async Task<IActionResult> Delete(int id)
         {
             var material = await _materialRepository.GetByIdAsync(id);
             if (material == null) return NotFound();
 
-            // Đếm số lượng sản phẩm đang dùng chất liệu này để hiển thị cảnh báo cho Admin
+            // Đếm số lượng sản phẩm đang dùng chất liệu này để hiển thị cảnh báo
             var allProducts = await _productRepository.GetAllAsync();
             var productsWithMaterial = allProducts.Where(p => p.MaterialId == id).ToList();
             ViewBag.ProductCount = productsWithMaterial.Count;
 
-            return View(material); // Tìm file Views/Material/Delete.cshtml
+            return View(material); // Tìm file Areas/Admin/Views/Material/Delete.cshtml
         }
 
-        // ── 5. Delete (POST): Thực thi quy trình dọn rác và xóa dữ liệu ──────
+        // ── 5. Delete (POST) ──
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -109,7 +115,7 @@ namespace AliceShop.Controllers
             var allProducts = await _productRepository.GetAllAsync();
             var productsWithMaterial = allProducts.Where(p => p.MaterialId == id).ToList();
 
-            // Quy trình dọn rác: Xóa file vật lý của tất cả ảnh phụ sản phẩm thuộc chất liệu này trong wwwroot
+            // Dọn dẹp tệp ảnh vật lý và xóa sản phẩm liên kết tránh lỗi Foreign Key Constraint
             foreach (var p in productsWithMaterial)
             {
                 if (p.Images != null)
@@ -123,11 +129,9 @@ namespace AliceShop.Controllers
                         }
                     }
                 }
-                // Xóa sản phẩm con ra khỏi SQL Server trước để tránh lỗi dính khóa ngoại (Foreign Key Constraint)
                 await _productRepository.DeleteAsync(p.Id);
             }
 
-            // Tiến hành xóa gốc bản ghi chất liệu cha
             await _materialRepository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }

@@ -1,0 +1,45 @@
+﻿@page
+@model ConfirmEmailModel
+@{
+    ViewData["Title"] = "Xác thực tài khoản | AliceStore";
+}
+
+<main class="flex-grow pt-20 pb-32 px-margin-mobile md:px-margin-desktop max-w-xl mx-auto w-full animate-fadeIn">
+
+    <div class="bg-white border border-outline-variant/30 rounded-xl p-8 md:p-12 shadow-[0_4px_20px_rgba(0,0,0,0.01)] text-center space-y-6">
+
+        @if (Model.StatusMessage != null && Model.StatusMessage.Contains("Lỗi", StringComparison.OrdinalIgnoreCase))
+        {
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-error-container/30 border border-error/20 text-error mb-2">
+                <span class="material-symbols-outlined text-[32px]">error</span>
+            </div>
+
+            <div class="space-y-1">
+                <h2 class="font-serif text-2xl font-medium text-on-surface uppercase tracking-wide m-0">Xác thực thất bại</h2>
+                <p class="text-xs text-error font-bold uppercase tracking-[0.15em] m-0">Liên kết không hợp lệ</p>
+            </div>
+        }
+        else
+        {
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-low border border-outline-variant/20 text-primary mb-2">
+                <span class="material-symbols-outlined text-[32px]">verified</span>
+            </div>
+
+            <div class="space-y-1">
+                <h2 class="font-serif text-2xl font-medium text-on-surface uppercase tracking-wide m-0">Xác thực thành công</h2>
+                <p class="text-xs text-primary font-bold uppercase tracking-[0.15em] m-0">Tài khoản an toàn</p>
+            </div>
+        }
+
+        <div class="font-sans text-sm text-on-surface-variant leading-relaxed font-medium">
+            @if (!string.IsNullOrEmpty(Model.StatusMessage))
+            {
+                <p class="m-0">@Model.StatusMessage</p>
+            }
+            else
+            {
+                <p class="m-0">Địa chỉ thư điện tử của bạn đã được kích hoạt thành công bảo mật trên hệ thống AliceStore.</p>
+            }
+        </div>
+
+        <div class="pt-4 border-t border-outline

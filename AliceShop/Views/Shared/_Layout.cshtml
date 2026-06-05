@@ -8,7 +8,6 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Manrope:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <script id="tailwind-config">
@@ -16,9 +15,9 @@
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#775a19",          /* Màu vàng kim chủ đạo */
+                        "primary": "#775a19",
                         "on-primary": "#ffffff",
-                        "background": "#faf9f7",        /* Nền trắng kem ngà tinh tế */
+                        "background": "#faf9f7",
                         "on-background": "#1a1c1b",
                         "surface": "#ffffff",
                         "surface-container-low": "#f4f3f1",
@@ -39,7 +38,6 @@
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
         }
-        /* Hiệu ứng đường gạch chân trượt mượt nhẹ từ tâm khi di chuột vào menu */
         .nav-underline-hover::after {
             content: '';
             position: absolute;
@@ -51,25 +49,19 @@
             transition: all 0.3s ease;
             transform: translateX(-50%);
         }
-
+        input::placeholder {
+            color: #7f7667 !important;
+            opacity: 0.6 !important;
+        }
         .nav-underline-hover:hover::after {
             width: 100%;
         }
-        /* Tạo hoạt ảnh mượt cho cụm Dropdown Admin */
         .animate-fadeIn {
             animation: fIn 0.2s ease-in-out forwards;
         }
-
         @@keyframes fIn {
-            from {
-                opacity: 0;
-                transform: translateY(5px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
     @await RenderSectionAsync("Styles", required: false)
@@ -78,54 +70,75 @@
 
     <header id="main-header" class="bg-white/90 backdrop-blur-md sticky top-0 z-50 flex justify-between items-center w-full px-6 md:px-20 py-6 transition-all duration-300 border-b border-outline-variant/30">
         <div class="flex items-center gap-12">
-            <a class="font-serif text-2xl uppercase tracking-[0.2em] text-primary no-underline" asp-controller="Home" asp-action="Index">AliceStore</a>
+            <a class="font-serif text-2xl uppercase tracking-[0.2em] text-primary no-underline" asp-area="" asp-controller="Home" asp-action="Index">AliceStore</a>
 
             <nav class="hidden md:flex gap-8">
                 <a class="font-semibold text-sm no-underline pb-1 transition-colors @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "text-primary border-b border-primary" : "text-on-surface-variant hover:text-primary relative nav-underline-hover")"
-                   asp-controller="Home" asp-action="Index">Trang chủ</a>
+                   asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a>
 
                 <a class="font-semibold text-sm no-underline pb-1 transition-colors @(ViewContext.RouteData.Values["controller"]?.ToString() == "Product" && ViewContext.RouteData.Values["action"]?.ToString() == "Collection" ? "text-primary border-b border-primary" : "text-on-surface-variant hover:text-primary relative nav-underline-hover")"
-                   asp-controller="Product" asp-action="Collection">Bộ sưu tập</a>
-
-                <div class="relative group">
-                    <button class="font-semibold text-sm text-on-surface-variant hover:text-primary flex items-center gap-1 pb-1 outline-none @(ViewContext.RouteData.Values["controller"]?.ToString() == "Category" || ViewContext.RouteData.Values["controller"]?.ToString() == "Material" || (ViewContext.RouteData.Values["controller"]?.ToString() == "Product" && ViewContext.RouteData.Values["action"]?.ToString() != "Collection") ? "text-primary" : "")">
-                        Quản trị Shop <span class="material-symbols-outlined text-xs">expand_more</span>
-                    </button>
-                    <div class="absolute top-full left-0 w-52 bg-white border border-outline-variant shadow-lg rounded-md py-2 hidden group-hover:block animate-fadeIn">
-                        <a class="block px-4 py-2 text-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary no-underline" asp-controller="Product" asp-action="Index">Quản lý sản phẩm</a>
-                        <a class="block px-4 py-2 text-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary no-underline" asp-controller="Product" asp-action="Create">Thêm sản phẩm mới</a>
-                        <hr class="border-outline-variant/50 my-1" />
-                        <a class="block px-4 py-2 text-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary no-underline" asp-controller="Category" asp-action="Index">Quản lý danh mục</a>
-                        <a class="block px-4 py-2 text-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary no-underline" asp-controller="Category" asp-action="Create">Thêm danh mục mới</a>
-                        <hr class="border-outline-variant/50 my-1" />
-                        <a class="block px-4 py-2 text-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary no-underline" asp-controller="Material" asp-action="Index">Quản lý chất liệu</a>
-                        <a class="block px-4 py-2 text-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary no-underline" asp-controller="Material" asp-action="Create">Thêm chất liệu mới</a>
-                    </div>
-                </div>
+                   asp-area="" asp-controller="Product" asp-action="Collection">Bộ sưu tập</a>
 
                 <a class="font-semibold text-sm no-underline pb-1 transition-colors @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "Contact" ? "text-primary border-b border-primary" : "text-on-surface-variant hover:text-primary relative nav-underline-hover")"
-                   asp-controller="Home" asp-action="Contact">Liên hệ</a>
+                   asp-area="" asp-controller="Home" asp-action="Contact">Liên hệ</a>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <a class="font-bold text-sm no-underline pb-1 text-primary relative nav-underline-hover flex items-center gap-1 animate-pulse"
+                       asp-area="Admin" asp-controller="Product" asp-action="Index">
+                        <span class="material-symbols-outlined text-sm">admin_panel_settings</span> Cổng Admin
+                    </a>
+                }
             </nav>
         </div>
 
         <div class="flex items-center gap-6">
             <form class="hidden sm:flex items-center bg-surface-container-low border border-outline-variant/60 rounded-full py-1.5 px-4 gap-2 transition-all duration-300 focus-within:border-primary focus-within:bg-white"
-                  asp-controller="Product" asp-action="Collection" method="get">
-
+                  asp-area="" asp-controller="Product" asp-action="Collection" method="get">
                 <button type="submit" class="text-on-surface hover:text-primary transition-colors bg-transparent border-none p-0 flex items-center outline-none cursor-pointer">
                     <span class="material-symbols-outlined text-xl font-bold" style="font-variation-settings: 'wght' 500">search</span>
                 </button>
-
                 <input class="bg-transparent border-none text-sm focus:ring-0 p-0 text-on-background placeholder:text-on-surface-variant/70 w-36 focus:w-48 transition-all duration-300 font-semibold tracking-wide"
                        type="search" name="q" placeholder="Tìm trang sức..." value="@Context.Request.Query["q"]" />
             </form>
 
-            <a href="#" class="text-on-surface-variant hover:text-primary transition-colors flex items-center"><span class="material-symbols-outlined">person</span></a>
+            @using Microsoft.AspNetCore.Identity
+            @inject SignInManager<ApplicationUser> SignInManager
+            @inject UserManager<ApplicationUser> UserManager
 
-            <button class="text-on-surface-variant hover:text-primary transition-colors relative bg-transparent border-none p-0 flex items-center outline-none cursor-pointer" onclick="toggleCart(true)">
-                <span class="material-symbols-outlined">shopping_bag</span>
-                <span class="absolute -top-1 -right-1 bg-primary text-on-primary text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
-            </button>
+            <div class="relative group flex items-center h-full py-4">
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <button class="text-primary hover:text-primary transition-colors flex items-center gap-0.5 cursor-pointer bg-transparent border-none p-0 outline-none h-10 w-10 justify-center">
+                        <span class="material-symbols-outlined font-bold" style="font-variation-settings: 'FILL' 1">account_circle</span>
+                    </button>
+
+                    <div class="absolute top-[85%] right-0 mt-2 w-56 bg-white border border-outline-variant shadow-lg rounded-md py-2 hidden group-hover:block animate-fadeIn z-50
+                                before:content-[''] before:absolute before:-top-3 before:left-0 before:w-full before:h-4 before:bg-transparent">
+                        <div class="px-4 py-2 border-b border-outline-variant/30">
+                            <p class="text-[10px] font-bold uppercase tracking-widest text-primary m-0">Xin chào</p>
+                            <p class="text-xs font-semibold text-on-background truncate m-0 mt-0.5">@UserManager.GetUserName(User)</p>
+                        </div>
+                        <a class="block px-4 py-2 text-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary no-underline font-medium" asp-area="Identity" asp-page="/Account/Manage/Index">Hồ sơ cá nhân</a>
+                        
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a class="block px-4 py-2 text-sm text-primary bg-primary/5 hover:bg-primary/10 no-underline font-bold" asp-area="Admin" asp-controller="Product" asp-action="Index">Bảng điều khiển Admin</a>
+                        }
+                        
+                        <hr class="border-outline-variant/40 my-1" />
+                        <form class="form-inline block m-0" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 no-underline font-semibold bg-transparent border-none cursor-pointer outline-none">Đăng xuất</button>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <a asp-area="Identity" asp-page="/Account/Login" class="text-on-surface-variant hover:text-primary transition-colors flex items-center h-10 w-10 justify-center" title="Đăng nhập hệ thống">
+                        <span class="material-symbols-outlined">person</span>
+                    </a>
+                }
+            </div>
         </div>
     </header>
 
@@ -166,24 +179,20 @@
             <div>
                 <h5 class="text-xs font-bold text-on-surface uppercase mb-6 tracking-widest">Khám phá</h5>
                 <ul class="flex flex-col gap-3 list-none p-0 m-0">
-                    <li><a class="text-sm text-on-surface-variant hover:text-primary no-underline transition-colors font-medium" asp-controller="Product" asp-action="Collection">BST Mới nhất</a></li>
+                    <li><a class="text-sm text-on-surface-variant hover:text-primary no-underline transition-colors font-medium" asp-area="" asp-controller="Product" asp-action="Collection">BST Mới nhất</a></li>
                     <li><a class="text-sm text-on-surface-variant hover:text-primary no-underline transition-colors font-medium" href="#">Nhẫn cưới độc quyền</a></li>
-                    <li><a class="text-sm text-on-surface-variant hover:text-primary no-underline transition-colors font-medium" href="#">Trang sức chế tác Nam</a></li>
                 </ul>
             </div>
             <div>
                 <h5 class="text-xs font-bold text-on-surface uppercase mb-6 tracking-widest">Hỗ trợ</h5>
                 <ul class="flex flex-col gap-3 list-none p-0 m-0">
-                    <li><a class="text-sm text-on-surface-variant hover:text-primary no-underline transition-colors font-medium" asp-controller="Home" asp-action="Contact">Liên hệ hỗ trợ</a></li>
-                    <li><a class="text-sm text-on-surface-variant hover:text-primary no-underline transition-colors font-medium" href="#">Chính sách vận chuyển</a></li>
-                    <li><a class="text-sm text-on-surface-variant hover:text-primary no-underline transition-colors font-medium" href="#">Chăm sóc đá quý</a></li>
+                    <li><a class="text-sm text-on-surface-variant hover:text-primary no-underline transition-colors font-medium" asp-area="" asp-controller="Home" asp-action="Contact">Liên hệ hỗ trợ</a></li>
                 </ul>
             </div>
             <div>
                 <h5 class="text-xs font-bold text-on-surface uppercase mb-6 tracking-widest">Pháp lý</h5>
                 <ul class="flex flex-col gap-3 list-none p-0 m-0">
                     <li><a class="text-sm text-on-surface-variant hover:text-primary no-underline transition-colors font-medium" href="#">Chính sách bảo mật</a></li>
-                    <li><a class="text-sm text-on-surface-variant hover:text-primary no-underline transition-colors font-medium" href="#">Điều khoản dịch vụ</a></li>
                 </ul>
             </div>
         </div>
@@ -192,24 +201,23 @@
             <p class="uppercase tracking-wider">© 2026 ALICESTORE. THIẾT KẾ BỞI TRẦN THỊ NGÀ.</p>
             <div class="flex gap-6 uppercase tracking-wider font-bold">
                 <span>TP. Hồ Chí Minh</span>
-                <span>Hà Nội</span>
                 <span>HUTECH Software Engineering</span>
             </div>
         </div>
     </footer>
 
     <div class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-outline-variant z-50 flex justify-around items-center py-3 shadow-lg">
-        <a class="flex flex-col items-center gap-0.5 text-primary no-underline" asp-controller="Home" asp-action="Index">
+        <a class="flex flex-col items-center gap-0.5 text-on-surface-variant no-underline hover:text-primary transition-colors" asp-area="" asp-controller="Home" asp-action="Index">
             <span class="material-symbols-outlined">home</span>
             <span class="text-[10px] font-semibold">Home</span>
         </a>
-        <a class="flex flex-col items-center gap-0.5 text-on-surface-variant no-underline hover:text-primary transition-colors" asp-controller="Product" asp-action="Collection">
+        <a class="flex flex-col items-center gap-0.5 text-on-surface-variant no-underline hover:text-primary transition-colors" asp-area="" asp-controller="Product" asp-action="Collection">
             <span class="material-symbols-outlined">grid_view</span>
             <span class="text-[10px] font-semibold">Shop</span>
         </a>
-        <a class="flex flex-col items-center gap-0.5 text-on-surface-variant no-underline hover:text-primary transition-colors" asp-controller="Product" asp-action="Index">
-            <span class="material-symbols-outlined">admin_panel_settings</span>
-            <span class="text-[10px] font-semibold">Admin</span>
+        <a class="flex flex-col items-center gap-0.5 text-primary no-underline" asp-area="Admin" asp-controller="Product" asp-action="Index">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">admin_panel_settings</span>
+            <span class="text-[10px] font-bold">Admin</span>
         </a>
     </div>
 
@@ -218,7 +226,6 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     <script>
-        // Hiệu ứng tự động thu nhỏ độ rộng của Header khi người dùng cuộn chuột xuống
         window.addEventListener('scroll', () => {
             const header = document.getElementById('main-header');
             if (window.scrollY > 50) {
@@ -230,7 +237,6 @@
             }
         });
 
-        // Hàm JavaScript kích hoạt đóng/mở Drawer giỏ hàng kèm lớp nền mờ mượt mà
         function toggleCart(open) {
             const sidebar = document.getElementById('cart-sidebar');
             const overlay = document.getElementById('cart-overlay');

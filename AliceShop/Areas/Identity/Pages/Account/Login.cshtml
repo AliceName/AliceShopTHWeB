@@ -1,0 +1,285 @@
+﻿@page
+@model LoginModel
+@{
+    ViewData["Title"] = "ALICE - Đăng nhập";
+    Layout = null; // Khử layout dùng chung để hiển thị trọn vẹn form Split Screen cao cấp
+}
+
+<!DOCTYPE html>
+<html class="light" lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>@ViewData["Title"]</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#e3e2e0",
+                        "inverse-primary": "#e9c176",
+                        "surface-bright": "#faf9f7",
+                        "on-tertiary-fixed-variant": "#464744",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#a5a6a2",
+                        "on-surface-variant": "#4e4639",
+                        "surface-container-highest": "#e3e2e0",
+                        "inverse-on-surface": "#f1f1ef",
+                        "secondary-fixed": "#e4e2e1",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#efeeec",
+                        "surface": "#faf9f7",
+                        "on-tertiary-container": "#3a3c39",
+                        "background": "#faf9f7",
+                        "surface-tint": "#775a19",
+                        "secondary-fixed-dim": "#c8c6c6",
+                        "primary-fixed-dim": "#e9c176",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#e3e3df",
+                        "surface-dim": "#dadad8",
+                        "on-tertiary-fixed": "#1a1c1a",
+                        "tertiary": "#5d5f5c",
+                        "outline": "#7f7667",
+                        "error": "#ba1a1a",
+                        "secondary": "#5f5e5e",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "tertiary-fixed-dim": "#c6c7c3",
+                        "primary-fixed": "#ffdea5",
+                        "on-background": "#1a1c1b",
+                        "on-secondary-container": "#656464",
+                        "outline-variant": "#d1c5b4",
+                        "on-surface": "#1a1c1b",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#c5a059",
+                        "on-primary-fixed-variant": "#5d4201",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e9e8e6",
+                        "on-secondary-fixed-variant": "#474747",
+                        "secondary-container": "#e4e2e1",
+                        "on-primary-fixed": "#261900",
+                        "surface-container-low": "#f4f3f1",
+                        "primary": "#775a19",
+                        "on-primary-container": "#4e3700",
+                        "inverse-surface": "#2f3130"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "container-max": "1440px",
+                        "margin-desktop": "80px",
+                        "gutter": "24px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Playfair Display"],
+                        "headline-lg": ["Playfair Display"],
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "label-md": ["Manrope"],
+                        "body-md": ["Manrope"],
+                        "body-lg": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["28px", { "lineHeight": "1.3", "fontWeight": "500" }],
+                        "headline-lg": ["40px", { "lineHeight": "1.2", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "500" }],
+                        "display-lg": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+
+        .input-focus-effect:focus {
+            border-color: #775a19 !important;
+            outline: none;
+            box-shadow: none !important;
+        }
+
+        .split-bg-animate {
+            animation: subtle-zoom 20s infinite alternate ease-in-out;
+        }
+
+        @@keyframes subtle-zoom {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.05);
+            }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed antialiased overflow-x-hidden">
+
+    <main class="min-h-screen flex flex-col md:flex-row items-stretch">
+        <!-- CANH TRÁI: KHỐI BRANDING ĐỒNG BỘ SPLIT SCREEN -->
+        <section class="hidden md:flex md:w-1/2 relative bg-surface-container-low items-center justify-center overflow-hidden">
+            <div class="absolute inset-0 z-0">
+                <img alt="Premium Luxury Interior" class="w-full h-full object-cover opacity-90 split-bg-animate" src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1200" />
+                <div class="absolute inset-0 bg-primary/5 mix-blend-multiply"></div>
+            </div>
+            <div class="relative z-10 text-center px-margin-desktop">
+                <h1 class="font-display-lg text-display-lg text-white mb-4 tracking-tighter drop-shadow-sm">ALICE</h1>
+                <p class="font-body-lg text-body-lg text-white/90 max-w-md mx-auto uppercase tracking-widest opacity-80">CRAFTED FOR THE MODERN ICON</p>
+            </div>
+            <div class="absolute inset-0 z-[5] pointer-events-none opacity-20 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]"></div>
+        </section>
+
+        <!-- CANH PHẢI: BIỂU MẪU ĐĂNG NHẬP HỆ THỐNG THỰC TẾ -->
+        <section class="flex-1 flex items-center justify-center p-margin-mobile md:p-margin-desktop bg-surface">
+            <div class="w-full max-w-[480px] space-y-10 py-12">
+
+                <div class="space-y-4">
+                    <div class="md:hidden flex justify-center mb-12">
+                        <span class="font-headline-md text-headline-md tracking-tighter text-on-surface">ALICE</span>
+                    </div>
+                    <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Đăng nhập</h2>
+                    <p class="font-body-md text-body-md text-on-surface-variant">Chào mừng trở lại. Vui lòng truy cập tài khoản định danh của bạn.</p>
+                </div>
+
+                <!-- FORM GỬI LỆNH ĐĂNG NHẬP (POST) -->
+                <form id="account" method="post" class="space-y-6">
+
+                    <!-- Hộp thông báo tổng hợp lỗi xác thực (Sai mật khẩu, tài khoản không tồn tại...) -->
+                    <div asp-validation-summary="ModelOnly" class="text-xs font-semibold text-error bg-error-container/20 border border-error/20 p-4 rounded-sm animate-fadeIn" role="alert"></div>
+
+                    <!-- Field: Email -->
+                    <div class="group">
+                        <label asp-for="Input.Email" class="block font-label-md text-label-md text-on-surface-variant uppercase mb-2 group-focus-within:text-primary transition-colors tracking-widest">Email <span class="text-error">*</span></label>
+                        <input asp-for="Input.Email" class="w-full bg-transparent border-0 border-b border-outline-variant py-3 px-0 font-body-md text-body-md input-focus-effect transition-all placeholder:text-outline/50 focus:ring-0" placeholder="example@@alice.store" required aria-required="true" autocomplete="username" />
+                        <span asp-validation-for="Input.Email" class="text-xs font-bold text-error mt-1 block"></span>
+                    </div>
+
+                    <!-- Field: Mật khẩu -->
+                    <div class="group">
+                        <div class="flex justify-between items-center mb-2">
+                            <label asp-for="Input.Password" class="block font-label-md text-label-md text-on-surface-variant uppercase group-focus-within:text-primary transition-colors tracking-widest m-0">Mật khẩu <span class="text-error">*</span></label>
+                            <a id="forgot-password" asp-page="./ForgotPassword" class="text-xs font-semibold text-outline hover:text-primary transition-colors no-underline">Quên mật khẩu?</a>
+                        </div>
+                        <div class="relative">
+                            <input asp-for="Input.Password" class="w-full bg-transparent border-0 border-b border-outline-variant py-3 px-0 font-body-md text-body-md input-focus-effect transition-all placeholder:text-outline/50 pr-10 focus:ring-0" placeholder="••••••••" required aria-required="true" autocomplete="current-password" />
+                            <button class="absolute right-0 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors bg-transparent border-none p-0 outline-none cursor-pointer flex items-center" type="button">
+                                <span class="material-symbols-outlined">visibility</span>
+                            </button>
+                        </div>
+                        <span asp-validation-for="Input.Password" class="text-xs font-bold text-error mt-1 block"></span>
+                    </div>
+
+                    <!-- Trạng thái ghi nhớ đăng nhập (Remember Me) -->
+                    <div class="flex items-center justify-between py-2">
+                        <div class="flex items-start gap-3">
+                            <div class="relative flex items-center h-5">
+                                <input asp-for="Input.RememberMe" class="w-5 h-5 rounded-sm border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer" />
+                            </div>
+                            <label asp-for="Input.RememberMe" class="font-body-md text-[14px] text-on-surface-variant leading-tight cursor-pointer select-none">
+                                Duy trì đăng nhập trên thiết bị này
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Nút bấm Đăng nhập (Màu tối Quiet Luxury đồng bộ) -->
+                    <div class="pt-4 space-y-6">
+                        <button id="login-submit" class="w-full h-[48px] bg-on-background text-surface font-label-md text-label-md uppercase tracking-widest hover:opacity-90 active:scale-[0.98] transition-all rounded-lg flex items-center justify-center gap-2 group shadow-lg shadow-black/5 cursor-pointer border border-transparent outline-none font-bold" type="submit">
+                            Đăng nhập tài khoản
+                            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                        </button>
+
+                        <!-- Đăng ký mới & Gửi lại mail kích hoạt -->
+                        <div class="text-center space-y-2 pt-2">
+                            <p class="font-body-md text-sm text-on-surface-variant m-0">
+                                Chưa có tài khoản thành viên?
+                                <a class="text-primary font-bold hover:underline underline-offset-4 decoration-1 ml-1 transition-all no-underline" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Đăng ký ngay</a>
+                            </p>
+                            <p class="font-body-md text-xs text-on-surface-variant m-0">
+                                <a id="resend-confirmation" asp-page="./ResendEmailConfirmation" class="text-outline hover:text-primary transition-colors no-underline">Gửi lại email kích hoạt tài khoản</a>
+                            </p>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Khối hiển thị bên thứ 3 (External Logins) -->
+                @if ((Model.ExternalLogins?.Count ?? 0) > 0)
+                {
+                    <div class="space-y-4 pt-4">
+                        <div class="flex items-center justify-center gap-4">
+                            <div class="h-px bg-outline-variant/20 flex-1"></div>
+                            <span class="font-label-md text-[12px] text-on-surface-variant/50">HOẶC ĐĂNG NHẬP BẰNG</span>
+                            <div class="h-px bg-outline-variant/20 flex-1"></div>
+                        </div>
+                        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="flex flex-col gap-2">
+                            @foreach (var provider in Model.ExternalLogins!)
+                            {
+                                <button type="submit" class="w-full h-[44px] border border-outline-variant text-on-surface font-label-md text-xs uppercase tracking-widest rounded-sm hover:bg-surface-container transition-all cursor-pointer bg-transparent" name="provider" value="@provider.Name" title="Đăng nhập bằng tài khoản @provider.DisplayName">
+                                    @provider.DisplayName
+                                </button>
+                            }
+                        </form>
+                    </div>
+                }
+
+                <!-- Brand Footer dành cho phiên bản Mobile -->
+                <div class="pt-12 text-center md:hidden">
+                    <p class="font-label-md text-[10px] text-outline tracking-widest uppercase m-0">© 2026 ALICE STORE. DESIGNED BY TRAN THI NGA.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Đồ họa trang trí chân trang bổ trợ -->
+    <div class="fixed bottom-0 right-0 p-margin-desktop pointer-events-none hidden lg:block">
+        <div class="w-px h-32 bg-gradient-to-t from-outline-variant/30 to-transparent"></div>
+        <div class="rotate-90 absolute bottom-16 -right-12">
+            <span class="font-label-md text-[10px] text-outline tracking-[0.5em] uppercase whitespace-nowrap">ALICE EXCLUSIVE SELECTION</span>
+        </div>
+    </div>
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Logic ẩn/hiện mật khẩu bằng eye icon mượt mà
+            document.querySelectorAll('button[type="button"]').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const input = this.previousElementSibling;
+                    const icon = this.querySelector('.material-symbols-outlined');
+
+                    if (input && icon) {
+                        const isPass = input.getAttribute('type') === 'password';
+                        input.setAttribute('type', isPass ? 'text' : 'password');
+                        icon.textContent = isPass ? 'visibility_off' : 'visibility';
+                    }
+                });
+            });
+
+            // Tự động gỡ bỏ hộp thông báo lỗi nếu hệ thống trống dữ liệu lỗi
+            const valSummary = document.querySelector('[asp-validation-summary]');
+            if (valSummary && (valSummary.innerHTML.trim() === "" || valSummary.classList.contains('validation-summary-valid'))) {
+                valSummary.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

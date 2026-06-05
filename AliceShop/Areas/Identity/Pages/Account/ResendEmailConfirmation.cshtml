@@ -1,0 +1,66 @@
+﻿@page
+@model ResendEmailConfirmationModel
+@{
+    ViewData["Title"] = "Gửi lại email xác nhận | AliceStore";
+    // Kế thừa Layout chung của hệ thống để đồng bộ Navbar & Footer động
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<!-- CONTAINER BO GỌN GIỮA MÀN HÌNH (Khắc phục hoàn toàn lỗi tràn màn hình) -->
+<main class="flex-grow pt-16 pb-24 px-margin-mobile md:px-margin-desktop max-w-xl mx-auto w-full animate-fadeIn">
+
+    <!-- KHỐI CARD BIỂU MẪU TƯƠNG PHẢN CAO -->
+    <div class="bg-white border border-outline-variant/30 rounded-xl p-8 md:p-12 shadow-[0_4px_20px_rgba(0,0,0,0.01)] space-y-6">
+
+        <!-- Tiêu đề phân hệ cấu trúc Quiet Luxury -->
+        <div class="space-y-2 text-center">
+            <h2 class="font-serif text-2xl md:text-3xl font-medium text-on-surface uppercase tracking-wide m-0">Xác thực tài khoản</h2>
+            <p class="font-sans text-sm text-on-surface-variant m-0">
+                Nhập địa chỉ email đăng ký để hệ thống gửi lại liên kết kích hoạt tài khoản thành viên.
+            </p>
+        </div>
+
+        <!-- FORM POST ĐẨY LỆNH GỬI LẠI MAIL -->
+        <form method="post" class="space-y-6">
+
+            <!-- ĐỒNG BỘ GỐC: Quét toàn bộ thông báo trạng thái và lỗi xác thực (asp-validation-summary="All") -->
+            <div asp-validation-summary="All" class="text-xs font-semibold text-error bg-error-container/20 border border-error/20 p-4 rounded-md animate-fadeIn" role="alert"></div>
+
+            <!-- Trường nhập liệu: Email -->
+            <div class="space-y-1.5 group">
+                <label asp-for="Input.Email" class="block text-[10px] uppercase tracking-[0.15em] text-outline font-bold group-focus-within:text-primary transition-colors">Email của bạn</label>
+                <input asp-for="Input.Email" class="w-full bg-transparent border border-outline-variant focus:border-primary rounded-lg py-3 px-4 font-sans text-sm font-semibold text-on-background focus:ring-0 outline-none transition-colors placeholder:text-outline-variant/40" placeholder="example@@alice.store" required aria-required="true" />
+                <span asp-validation-for="Input.Email" class="text-xs font-bold text-error mt-1 block"></span>
+            </div>
+
+            <!-- NÚT BẤM VÀNG KIM NỔI BẬT NỀN TRẮNG -->
+            <div class="pt-2">
+                <button type="submit" class="w-full inline-flex items-center justify-center py-3.5 bg-primary text-on-primary font-label-md text-xs uppercase tracking-widest rounded-lg transition-all duration-300 active:scale-[0.98] hover:bg-opacity-90 border-none outline-none shadow-md shadow-primary/10 font-bold cursor-pointer">
+                    Gửi lại thư xác nhận
+                </button>
+            </div>
+        </form>
+
+        <!-- Lối lui chuyển tuyến về trang đăng nhập nhanh -->
+        <div class="text-center border-t border-outline-variant/20 pt-4">
+            <a class="inline-flex items-center gap-2 text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors no-underline" asp-page="./Login">
+                <span class="material-symbols-outlined text-sm">arrow_back</span>
+                <span>Quay lại trang đăng nhập</span>
+            </a>
+        </div>
+
+    </div>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Tự động gỡ ẩn hộp lỗi nếu phát hiện có chuỗi lỗi trả về từ hệ thống
+            const valSummary = document.querySelector('[asp-validation-summary]');
+            if (valSummary && (valSummary.innerHTML.trim() === "" || valSummary.classList.contains('validation-summary-valid'))) {
+                valSummary.classList.add('hidden');
+            }
+        });
+    </script>
+}

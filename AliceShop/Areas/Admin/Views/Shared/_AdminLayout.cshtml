@@ -1,0 +1,182 @@
+﻿<!DOCTYPE html>
+<html class="light" lang="vi">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>@(ViewData["Title"] ?? "Quản trị hệ thống") | AliceStore Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#5d5f5c",
+                        "surface-variant": "#e3e2e0",
+                        "surface-dim": "#dadad8",
+                        "on-surface": "#1a1c1b",
+                        "surface-tint": "#775a19",
+                        "primary": "#775a19",
+                        "tertiary-container": "#a5a6a2",
+                        "surface-container-highest": "#e3e2e0",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#c8c6c6",
+                        "primary-fixed-dim": "#e9c176",
+                        "on-background": "#1a1c1b",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "on-primary-fixed": "#261900",
+                        "inverse-surface": "#2f3130",
+                        "outline-variant": "#d1c5b4",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#7f7667",
+                        "error-container": "#ffdad6",
+                        "background": "#faf9f7",
+                        "secondary-container": "#e4e2e1",
+                        "primary-container": "#c5a059",
+                        "on-error": "#ffffff",
+                        "on-surface-variant": "#4e4639",
+                        "on-primary": "#ffffff",
+                        "inverse-on-surface": "#f1f1ef",
+                        "on-primary-container": "#4e3700",
+                        "surface": "#faf9f7",
+                        "secondary": "#5f5e5e",
+                        "on-primary-fixed-variant": "#5d4201",
+                        "inverse-primary": "#e9c176",
+                        "primary-fixed": "#ffdea5",
+                        "tertiary-fixed": "#e3e3df",
+                        "surface-bright": "#faf9f7",
+                        "on-secondary-container": "#656464",
+                        "secondary-fixed": "#e4e2e1",
+                        "on-tertiary-container": "#3a3c39",
+                        "on-secondary-fixed-variant": "#474747",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#1a1c1a",
+                        "on-tertiary-fixed-variant": "#464744",
+                        "tertiary-fixed-dim": "#c6c7c3",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f4f3f1",
+                        "surface-container": "#efeeec",
+                        "surface-container-high": "#e9e8e6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "body-lg": ["Manrope"],
+                        "body-md": ["Manrope"],
+                        "label-md": ["Manrope"],
+                        "headline-md": ["Playfair Display"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .luxury-shadow {
+            box-shadow: 0 20px 25px -5px rgba(26, 28, 27, 0.04), 0 10px 10px -5px rgba(26, 28, 27, 0.02);
+        }
+        .animate-fadeIn {
+            animation: fIn 0.3s ease-in-out forwards;
+        }
+        @@keyframes fIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="font-body-md text-body-md bg-[#faf9f7] text-[#1a1c1b] overflow-x-hidden">
+
+    <aside class="h-screen w-64 fixed left-0 top-0 flex flex-col py-6 px-4 border-r border-outline-variant bg-[#faf9f7] z-50 overflow-y-auto">
+        <div class="mb-10 px-4">
+            <h1 class="font-headline-md text-headline-md font-bold text-on-surface m-0">AliceStore</h1>
+            <p class="font-label-md text-xs text-on-surface-variant uppercase tracking-widest mt-1 m-0">Management Portal</p>
+        </div>
+
+        <a class="mb-8 mx-4 bg-on-surface text-white py-3 px-6 rounded-sm font-label-md text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-transform active:scale-95 duration-200 no-underline"
+           asp-area="Admin" asp-controller="Product" asp-action="Create">
+            <span class="material-symbols-outlined text-[20px]">add</span>
+            Thêm sản phẩm
+        </a>
+
+        <nav class="flex-grow space-y-1">
+            <a class="flex items-center gap-4 px-4 py-3 rounded-md transition-all duration-200 no-underline @(ViewContext.RouteData.Values["controller"]?.ToString() == "Product" ? "text-primary border-r-2 border-primary bg-surface-container font-bold" : "text-on-surface-variant hover:text-primary hover:bg-surface-container/30")" 
+               asp-area="Admin" asp-controller="Product" asp-action="Index">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <span class="font-label-md text-xs uppercase tracking-wider">Sản Phẩm</span>
+            </a>
+
+            <a class="flex items-center gap-4 px-4 py-3 rounded-md transition-all duration-200 no-underline @(ViewContext.RouteData.Values["controller"]?.ToString() == "Category" ? "text-primary border-r-2 border-primary bg-surface-container font-bold" : "text-on-surface-variant hover:text-primary hover:bg-surface-container/30")" 
+               asp-area="Admin" asp-controller="Category" asp-action="Index">
+                <span class="material-symbols-outlined">category</span>
+                <span class="font-label-md text-xs uppercase tracking-wider">Danh Mục</span>
+            </a>
+
+            <a class="flex items-center gap-4 px-4 py-3 rounded-md transition-all duration-200 no-underline @(ViewContext.RouteData.Values["controller"]?.ToString() == "Material" ? "text-primary border-r-2 border-primary bg-surface-container font-bold" : "text-on-surface-variant hover:text-primary hover:bg-surface-container/30")" 
+               asp-area="Admin" asp-controller="Material" asp-action="Index">
+                <span class="material-symbols-outlined">texture</span>
+                <span class="font-label-md text-xs uppercase tracking-wider">Chất Liệu</span>
+            </a>
+
+            <hr class="border-outline-variant/30 my-4" />
+
+            <a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:text-primary transition-all duration-200 no-underline" 
+               asp-area="" asp-controller="Product" asp-action="Collection">
+                <span class="material-symbols-outlined">storefront</span>
+                <span class="font-label-md text-xs uppercase tracking-wider">Xem Website</span>
+            </a>
+        </nav>
+
+        <div class="mt-auto border-t border-outline-variant pt-6 px-4">
+            @using Microsoft.AspNetCore.Identity
+            @inject SignInManager<ApplicationUser> SignInManager
+            <form class="m-0 block" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+                <button type="submit" class="w-full flex items-center gap-4 text-error hover:bg-red-50/50 py-3 px-4 rounded-md transition-colors bg-transparent border-none cursor-pointer outline-none text-left">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="font-label-md text-xs uppercase tracking-wider font-bold">Đăng xuất</span>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="ml-64 min-h-screen flex flex-col">
+        <header class="flex justify-between items-center w-full px-8 py-5 sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-outline-variant/30">
+            <div class="flex items-center gap-4">
+                <h2 class="font-headline-md text-xl font-medium text-on-surface m-0">Hệ thống quản trị</h2>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-3 border-l border-outline-variant pl-4">
+                    <span class="material-symbols-outlined text-[32px] text-primary" style="font-variation-settings: 'FILL' 1">account_circle</span>
+                    <div class="flex flex-col">
+                        <span class="font-label-md text-xs leading-none font-bold text-on-surface">@(User.Identity?.Name ?? "Alice Admin")</span>
+                        <span class="text-[10px] uppercase tracking-wider opacity-60 mt-0.5">Quản trị viên</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-8 max-w-[1440px] w-full mx-auto flex-grow animate-fadeIn">
+            @RenderBody()
+        </div>
+
+        <footer class="p-8 text-center border-t border-outline-variant/20 mt-auto">
+            <p class="font-label-md text-[10px] uppercase tracking-widest m-0 opacity-40">© 2026 ALICESTORE ADMIN PANEL. DESIGNED BY TRAN THI NGA.</p>
+        </footer>
+    </main>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
