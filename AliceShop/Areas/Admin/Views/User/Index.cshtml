@@ -1,0 +1,103 @@
+@model IEnumerable<AliceShop.Models.UserVM>
+
+@{
+    ViewData["Title"] = "Quản lý Người Dùng";
+}
+
+<main class="pt-12 pb-20 max-w-[1440px] mx-auto px-6 md:px-20 animate-fadeIn">
+    <header class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+            <span class="text-xs font-bold text-primary uppercase tracking-widest block mb-1">Chế độ quản trị viên</span>
+            <h1 class="font-sans text-2xl md:text-3xl font-bold text-on-surface mb-2 tracking-wide">Quản Lý Người Dùng</h1>
+            <p class="text-on-surface-variant font-sans text-sm font-medium">Theo dõi thành viên, phân quyền và khóa tài khoản vi phạm.</p>
+        </div>
+    </header>
+
+    @if (TempData["success"] != null)
+    {
+        <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded relative font-sans text-sm">
+            @TempData["success"]
+        </div>
+    }
+
+    <div class="bg-surface-container-low rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-surface-container border-b border-outline-variant/30 text-xs uppercase tracking-wider text-on-surface font-bold">
+                        <th class="p-4 font-sans whitespace-nowrap">Họ Tên</th>
+                        <th class="p-4 font-sans whitespace-nowrap">Email</th>
+                        <th class="p-4 font-sans whitespace-nowrap">Số Điện Thoại</th>
+                        <th class="p-4 font-sans whitespace-nowrap text-center">Vai Trò</th>
+                        <th class="p-4 font-sans whitespace-nowrap text-center">Trạng Thái</th>
+                        <th class="p-4 font-sans whitespace-nowrap text-right">Tác vụ</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant/20">
+                    @foreach (var item in Model)
+                    {
+                        var isLocked = item.User.LockoutEnd != null && item.User.LockoutEnd > DateTime.Now;
+                        <tr class="hover:bg-surface-container/50 transition-colors">
+                            <td class="p-4 font-sans text-sm font-semibold text-on-background">@item.User.FullName</td>
+                            <td class="p-4 font-sans text-sm text-on-surface">@item.User.Email</td>
+                            <td class="p-4 font-sans text-sm text-on-surface">@item.User.PhoneNumber</td>
+                            <td class="p-4 text-center">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold font-sans tracking-wide bg-primary/10 text-primary">
+                                    @item.Role
+                                </span>
+                            </td>
+                            <td class="p-4 text-center">
+                                @if (isLocked)
+                                {
+                                    <span class="px-3 py-1 rounded border border-red-500/30 text-red-600 bg-red-50 text-xs font-bold font-sans">Đã Khóa</span>
+                                }
+                                else
+                                {
+                                    <span class="px-3 py-1 rounded border border-green-500/30 text-green-600 bg-green-50 text-xs font-bold font-sans">Hoạt Động</span>
+                                }
+                            </td>
+                            <td class="p-4 text-right space-x-2">
+                                <a asp-action="EditRole" asp-route-userId="@item.User.Id" class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-surface-container hover:bg-primary hover:text-white transition-colors text-on-surface-variant" title="Phân Quyền">
+                                    <span class="material-symbols-outlined text-[18px]">manage_accounts</span>
+                                </a>
+                                @if (isLocked)
+                                {
+                                    <button onclick="LockUnlock('@item.User.Id')" class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-red-50 hover:bg-red-600 hover:text-white transition-colors text-red-600 border border-red-200" title="Mở khóa tài khoản">
+                                        <span class="material-symbols-outlined text-[18px]">lock_open</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button onclick="LockUnlock('@item.User.Id')" class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-green-50 hover:bg-red-600 hover:text-white transition-colors text-green-600 border border-green-200" title="Khóa tài khoản">
+                                        <span class="material-symbols-outlined text-[18px]">lock</span>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    <script>
+        function LockUnlock(id) {
+            if (confirm('Bạn có chắc chắn muốn thay đổi trạng thái đăng nhập của tài khoản này?')) {
+                fetch('/Admin/User/LockUnlock?id=' + id, {
+                    method: 'POST'
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(err => alert("Lỗi hệ thống!"));
+            }
+        }
+    </script>
+}

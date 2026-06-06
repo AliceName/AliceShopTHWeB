@@ -18,5 +18,7 @@ namespace AliceShop.Models
         [Required]
         public int MaterialId { get; set; }
         public Material? Material { get; set; }
+        // Mối quan hệ một - nhiều: Một sản phẩm sẽ có nhiều biến thể kích cỡ
+        public virtual ICollection<ProductSizeVariant> ProductSizeVariants { get; set; } = new List<ProductSizeVariant>();
     }
 }

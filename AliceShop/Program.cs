@@ -32,6 +32,20 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     .AddDefaultUI()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+// 2. 🔥 CẤU HÌNH COOKIE GHI NHỚ:
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";
+    options.LogoutPath = "/Identity/Account/Logout";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+
+    // Cấu hình thời gian ghi nhớ đăng nhập (Ví dụ: 14 ngày)
+    options.ExpireTimeSpan = TimeSpan.FromDays(14);
+
+    // Nếu người dùng liên tục truy cập trong 14 ngày này, Cookie sẽ tự động gia hạn thêm
+    options.SlidingExpiration = true;
+});
+
 // ── 3. ĐĂNG KÝ DỊCH VỤ GỬI MAIL THẬT (Đã sửa đổi tối ưu) ───────────────────
 builder.Services.AddSingleton<IEmailSender, RealEmailSender>();
 
@@ -43,6 +57,16 @@ builder.Services.AddScoped<IProductRepository, EFProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, EFCategoryRepository>();
 builder.Services.AddScoped<IMaterialRepository, EFMaterialRepository>();
 
+
+builder.Services.AddSession(options => {
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Giỏ hàng lưu tạm trong 30 phút
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+
+
+
 var app = builder.Build();
 
 // ── 5. CẤU HÌNH PIPELINE XỬ LÝ HTTP (MIDDLEWARE) ─────────────────────────
@@ -53,6 +77,9 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 
 app.UseRouting();
+
+
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();

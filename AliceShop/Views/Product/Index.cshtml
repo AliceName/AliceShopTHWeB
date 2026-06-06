@@ -10,7 +10,7 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-12">
         <div>
             <span class="text-xs font-bold text-primary uppercase tracking-widest block mb-1">Bảng điều khiển Admin</span>
-            <h1 class="font-serif text-3xl font-medium text-on-background">Quản lý sản phẩm</h1>
+            <h1 class="font-sans text-2xl md:text-3xl font-bold text-on-background m-0">Quản lý sản phẩm</h1>
             <p class="text-on-surface-variant text-sm mt-1">Hệ thống hiển thị dạng thẻ cao cấp - Đồng bộ thời gian thực với SQL Server</p>
         </div>
         <a asp-action="Create" class="inline-flex items-center gap-2 bg-primary text-white font-semibold text-xs uppercase tracking-widest px-6 py-3.5 rounded-md hover:bg-opacity-90 transition-all duration-300 no-underline shadow-sm">
@@ -37,17 +37,17 @@
             <div class="bg-white border border-outline-variant/40 rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col justify-between group transition-all duration-300 hover:shadow-md">
                 <div>
                     <div class="relative aspect-[4/5] bg-surface-container-low overflow-hidden border-b border-outline-variant/20">
-                        <img src="@displayImageUrl" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" alt="@item.Name" loading="lazy" />
+                        <img src="@displayImageUrl" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" alt="@item.Name" loading="lazy" onerror="this.onerror=null; this.src='/images/placeholder.png';" />
                         <span class="absolute top-3 left-3 bg-on-background/80 text-white font-mono text-[10px] px-2 py-0.5 rounded backdrop-blur-sm tracking-wider">ID: #@item.Id</span>
                     </div>
 
                     <div class="p-5 space-y-3">
-                        <span class="inline-flex items-center gap-1 bg-primary/5 text-primary text-[11px] px-2 py-1 rounded font-semibold tracking-wide border border-primary/10">
+                        <span class="inline-flex items-center gap-1 bg-primary/5 text-primary text-[11px] px-2 py-1 rounded font-semibold tracking-wide border border-primary/10 font-sans">
                             <span class="material-symbols-outlined text-[13px]">sell</span> @currentCategoryName
                         </span>
-                        <h3 class="font-semibold text-on-background text-sm tracking-wide uppercase line-clamp-1 m-0" title="@item.Name">@item.Name</h3>
+                        <h3 class="font-sans font-bold text-on-background text-sm tracking-wide uppercase line-clamp-1 m-0" title="@item.Name">@item.Name</h3>
                         <p class="font-sans text-sm font-bold text-red-800 m-0">@string.Format("{0:N0} đ", item.Price)</p>
-                        <p class="text-on-surface-variant/80 text-xs leading-relaxed line-clamp-2 pt-1 border-t border-outline-variant/20 m-0" style="text-align: justify;">@item.Description</p>
+                        <p class="text-on-surface-variant/80 text-xs leading-relaxed line-clamp-2 pt-1 border-t border-outline-variant/20 m-0 font-sans" style="text-align: justify;">@item.Description</p>
                     </div>
                 </div>
 

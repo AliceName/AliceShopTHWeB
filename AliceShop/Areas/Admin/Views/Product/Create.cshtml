@@ -1,17 +1,62 @@
-﻿@model AliceShop.Models.Product
+@model AliceShop.Models.Product
 
 @{
     ViewData["Title"] = "Thêm Sản Phẩm Mới";
 }
 
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container--default .select2-selection--single {
+            background-color: transparent !important;
+            border: none !important;
+            height: auto !important;
+            padding: 0.75rem 0 !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #1a1c1b !important;
+            padding-left: 0 !important;
+            font-weight: 600 !important;
+            font-size: 0.875rem !important;
+            font-family: "Inter", sans-serif !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            display: none !important;
+        }
+        .select2-dropdown {
+            border: 1px solid #d1c5b4 !important;
+            border-radius: 0.5rem !important;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important;
+            font-family: "Inter", sans-serif !important;
+            font-size: 0.875rem !important;
+        }
+        .select2-search__field {
+            border: 1px solid #d1c5b4 !important;
+            border-radius: 0.25rem !important;
+            padding: 0.5rem !important;
+            outline: none !important;
+        }
+        .select2-search__field:focus {
+            border-color: #775a19 !important;
+        }
+        .select2-results__option--highlighted[aria-selected] {
+            background-color: #775a19 !important;
+            color: white !important;
+        }
+        .select2-container {
+            width: 100% !important;
+        }
+    </style>
+}
+
 <main class="pt-12 pb-20 max-w-[1440px] mx-auto px-6 md:px-20 animate-fadeIn">
     <header class="mb-12">
         <span class="text-xs font-bold text-primary uppercase tracking-widest block mb-1">Chế độ quản trị viên</span>
-        <h1 class="font-serif text-3xl md:text-4xl text-on-surface mb-2 font-medium tracking-wide">Thêm Sản Phẩm Mới</h1>
+        <h1 class="font-sans text-2xl md:text-3xl font-bold text-on-surface mb-2 tracking-wide">Thêm Sản Phẩm Mới</h1>
         <p class="text-on-surface-variant font-sans text-sm font-medium">Quản lý kho hàng và giới thiệu các tác phẩm trang sức tinh xảo nhất của bạn vào hệ thống.</p>
     </header>
 
-    <form asp-action="Create" method="post" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-12 gap-12" autocomplete="off">
+    <form asp-action="Create" method="post" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-12 gap-12" autocomplete="off" id="create-product-form">
 
         <div asp-validation-summary="ModelOnly" class="col-span-12 text-sm text-red-600 bg-red-50 p-4 rounded border border-red-200 hidden" id="validationSummary"></div>
 
@@ -25,8 +70,8 @@
                     <p class="text-center px-8 text-sm text-on-surface font-semibold m-0 leading-relaxed">
                         Kéo và thả ảnh chính vào đây hoặc <span class="text-primary font-bold">chọn tệp</span>
                     </p>
-                    <input type="file" name="imageFiles" id="main-image-input" accept="image/*" class="hidden" required />
                 </div>
+                <input type="file" name="imageUrl" id="main-image-input" accept="image/*" class="hidden" required />
             </div>
 
             <div class="bg-surface-container-low p-6 rounded-lg border border-outline-variant/30 shadow-sm">
@@ -49,7 +94,7 @@
                     <label asp-for="Name" class="font-bold text-xs uppercase tracking-widest text-on-surface block mb-2">
                         Tên sản phẩm trang sức <span class="text-red-600">*</span>
                     </label>
-                    <input asp-for="Name" class="w-full input-underline py-3 px-0 text-lg font-serif text-on-background font-medium focus:outline-none focus:ring-0" placeholder="Ví dụ: Nhẫn Kim Cương Eternal Glow" required />
+                    <input asp-for="Name" class="w-full input-underline py-3 px-0 text-base md:text-lg font-sans text-on-background font-medium focus:outline-none focus:ring-0 bg-transparent" placeholder="Ví dụ: Nhẫn Kim Cương Eternal Glow" required />
                     <span asp-validation-for="Name" class="text-red-600 text-xs font-semibold mt-1 block"></span>
                 </div>
 
@@ -59,7 +104,7 @@
                             Phân loại danh mục <span class="text-red-600">*</span>
                         </label>
                         <div class="relative border-b border-[#d1c5b4]">
-                            <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="w-full border-none bg-transparent py-3 px-0 text-sm text-on-surface font-semibold cursor-pointer focus:ring-0 focus:outline-none" required>
+                            <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="w-full border-none bg-transparent py-3 px-0 text-sm text-on-surface font-sans font-semibold cursor-pointer focus:ring-0 focus:outline-none" required>
                                 <option value="" disabled selected>-- Chọn nhóm trang sức --</option>
                             </select>
                             <span class="material-symbols-outlined absolute right-0 top-3 pointer-events-none text-on-surface">expand_more</span>
@@ -72,7 +117,7 @@
                             Chất liệu chế tác <span class="text-red-600">*</span>
                         </label>
                         <div class="relative border-b border-[#d1c5b4]">
-                            <select asp-for="MaterialId" asp-items="ViewBag.Materials" class="w-full border-none bg-transparent py-3 px-0 text-sm text-on-surface font-semibold cursor-pointer focus:ring-0 focus:outline-none" required>
+                            <select asp-for="MaterialId" asp-items="ViewBag.Materials" class="w-full border-none bg-transparent py-3 px-0 text-sm text-on-surface font-sans font-semibold cursor-pointer focus:ring-0 focus:outline-none" required>
                                 <option value="" disabled selected>-- Chọn chất liệu trang sức --</option>
                             </select>
                             <span class="material-symbols-outlined absolute right-0 top-3 pointer-events-none text-on-surface">expand_more</span>
@@ -81,29 +126,71 @@
                     </div>
                 </div>
 
-                <div>
-                    <label class="font-bold text-xs uppercase tracking-widest text-on-surface block mb-2">
-                        Giá niêm yết bán lẻ (VNĐ) <span class="text-red-600">*</span>
-                    </label>
-                    <input type="text" id="price-display" class="w-full input-underline py-3 px-0 text-xl font-sans text-primary font-bold focus:ring-0 focus:outline-none" placeholder="0" required />
-                    <input type="hidden" asp-for="Price" id="price-actual" />
+                <div class="relative">
+                    <div class="flex justify-between items-end mb-2">
+                        <label class="font-bold text-xs uppercase tracking-widest text-on-surface block m-0">
+                            Giá niêm yết bán lẻ gốc (VNĐ) <span class="text-red-600">*</span>
+                        </label>
+                        <span id="price-hint" class="font-sans text-sm font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-md opacity-0 transition-opacity duration-300 pointer-events-none transform translate-y-1">0 VNĐ</span>
+                    </div>
+                    <input type="text" inputmode="numeric" id="price-display" class="w-full input-underline py-3 px-0 text-xl font-sans text-primary font-bold focus:ring-0 focus:outline-none bg-transparent" placeholder="0" required />
+                    <input type="hidden" name="Price" id="price-actual" value="@(Model?.Price ?? 0)" />
                     <span asp-validation-for="Price" class="text-red-600 text-xs font-semibold mt-1 block"></span>
+                </div>
+
+                <div id="size-section" class="space-y-4 bg-surface-container-low/60 p-6 rounded-xl border border-outline-variant/30" style="display: none;">
+                    <h3 class="font-sans text-xs font-bold uppercase text-primary tracking-widest m-0 border-b border-outline-variant/20 pb-3">
+                        Cấu hình kích cỡ & Tồn kho sản phẩm
+                    </h3>
+                    <p class="text-[11px] text-on-surface-variant font-sans font-medium m-0 pb-1">Tích chọn các kích cỡ áp dụng cho mẫu trang sức này và nhập số lượng tồn kho tương ứng.</p>
+
+                    <div class="space-y-2.5">
+                        @if (ViewBag.AvailableSizes != null)
+                        {
+                            var sizeList = (List<AliceShop.Areas.Admin.Controllers.SizeVariantInputModel>)ViewBag.AvailableSizes;
+                            for (int i = 0; i < sizeList.Count; i++)
+                            {
+                                <div class="size-row flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-white p-3 rounded-lg border border-outline-variant/20 hover:border-primary/30 transition-colors" data-category="@sizeList[i].CategoryId">
+
+                                    <label class="flex items-center gap-3 cursor-pointer select-none min-w-[110px] py-1">
+                                        <input type="checkbox" name="sizeVariants[@i].IsSelected" value="true" class="w-4 h-4 text-primary focus:ring-primary border-outline-variant rounded cursor-pointer" />
+                                        <input type="hidden" name="sizeVariants[@i].ProductSizeId" value="@sizeList[i].ProductSizeId" />
+                                        <input type="hidden" name="sizeVariants[@i].SizeName" value="@sizeList[i].SizeName" />
+                                        <span class="font-sans text-xs font-bold text-on-background">@sizeList[i].SizeName</span>
+                                    </label>
+
+                                    <div class="relative w-full sm:w-auto flex items-center border border-outline-variant rounded-lg bg-transparent focus-within:border-primary transition-colors">
+                                        <span class="bg-surface-container-low px-2.5 py-1.5 text-[10px] font-bold text-outline uppercase tracking-wider font-sans rounded-l-lg">Giá riêng</span>
+                                        <input type="text" inputmode="numeric" class="size-price-display w-full sm:w-32 border-none p-1.5 text-xs font-bold text-primary focus:ring-0 outline-none bg-transparent font-sans" placeholder="0 (giá gốc)" />
+                                        <input type="hidden" name="sizeVariants[@i].Price" class="size-price-actual" value="0" />
+                                        <span class="size-price-hint absolute -top-6 left-1/2 -translate-x-1/2 bg-primary/90 text-white text-[10px] font-bold px-2 py-0.5 rounded opacity-0 transition-opacity pointer-events-none whitespace-nowrap z-10">0 đ</span>
+                                    </div>
+
+                                    <div class="w-full sm:w-auto flex items-center border border-outline-variant rounded-lg overflow-hidden bg-transparent focus-within:border-primary transition-colors">
+                                        <span class="bg-surface-container-low px-2.5 py-1.5 text-[10px] font-bold text-outline uppercase tracking-wider font-sans">Tồn kho</span>
+                                        <input type="number" name="sizeVariants[@i].StockQuantity" value="0" min="0" class="w-full sm:w-24 border-none p-1.5 text-xs font-semibold text-on-background focus:ring-0 outline-none bg-transparent font-sans" required />
+                                    </div>
+
+                                </div>
+                            }
+                        }
+                    </div>
                 </div>
 
                 <div>
                     <label asp-for="Description" class="font-bold text-xs uppercase tracking-widest text-on-surface block mb-2">
                         Mô tả câu chuyện & thông số chi tiết
                     </label>
-                    <textarea asp-for="Description" class="w-full input-underline py-3 px-0 text-sm text-on-background font-medium text-justify resize-none" placeholder="Chia sẻ về cảm hứng thiết kế..." rows="6"></textarea>
+                    <textarea asp-for="Description" class="w-full input-underline py-3 px-0 text-sm text-on-background font-sans font-medium text-justify resize-none bg-transparent focus:outline-none focus:ring-0" placeholder="Chia sẻ về cảm hứng thiết kế..." rows="5"></textarea>
                     <span asp-validation-for="Description" class="text-red-600 text-xs font-semibold mt-1 block"></span>
                 </div>
             </section>
 
-            <div class="pt-8 flex flex-col sm:flex-row gap-4 items-center">
-                <button class="w-full sm:w-auto px-12 py-4 bg-on-background text-white font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-primary transition-colors shadow-sm cursor-pointer outline-none border border-transparent" type="submit">
+            <div class="pt-4 flex flex-col sm:flex-row gap-4 items-center">
+                <button class="w-full sm:w-auto px-12 py-4 bg-on-background text-white font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-primary transition-colors shadow-sm cursor-pointer outline-none border border-transparent font-sans" type="submit">
                     Lưu Sản Phẩm
                 </button>
-                <a asp-action="Index" class="w-full sm:w-auto px-12 py-4 border border-outline text-on-surface font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-surface-container text-center no-underline transition-colors flex items-center justify-center">
+                <a asp-action="Index" class="w-full sm:w-auto px-12 py-4 border border-outline text-on-surface font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-surface-container text-center no-underline transition-colors flex items-center justify-center font-sans">
                     Hủy Bỏ
                 </a>
             </div>
@@ -115,6 +202,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
         // 1. Logic tải và xem trước (Preview) ảnh đại diện chính
@@ -158,21 +246,150 @@
             });
         });
 
-        // 3. Mặt nạ định dạng tiền tệ VND chữ siêu nét, rõ ràng chống gõ nhầm số
+        // 🔥 3. ĐA SỬA: Sửa lại logic mặt nạ tiền tệ VND chuẩn xác chống sập dữ liệu
         document.addEventListener("DOMContentLoaded", function () {
             const priceDisplay = document.getElementById("price-display");
             const priceActual = document.getElementById("price-actual");
+            const priceHint = document.getElementById("price-hint");
 
             function formatVND(value) {
                 if (!value) return "";
-                return value.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                let cleanValue = value.toString().replace(/\D/g, "");
+                if (!cleanValue) return "";
+                return cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
             }
 
-            priceDisplay.addEventListener("input", function (e) {
-                let rawValue = e.target.value.replace(/\D/g, "");
-                priceActual.value = rawValue;
-                e.target.value = formatVND(rawValue);
+            // Đồng bộ nạp dữ liệu cũ ra màn hình nếu có sẵn (luồng edit hoặc khi báo lỗi form)
+            if (priceActual && priceActual.value && priceActual.value !== "0") {
+                priceDisplay.value = formatVND(priceActual.value);
+            }
+
+            // Khi bấm vào ô nhập, gỡ bỏ định dạng để gõ số thô -> Chống lỗi Unikey
+            priceDisplay.addEventListener("focus", function (e) {
+                let rawValue = this.value.replace(/\D/g, "");
+                this.value = rawValue;
+                
+                // Hiện thanh hint
+                if (priceHint) {
+                    priceHint.textContent = (formatVND(rawValue) || "0") + " VNĐ";
+                    priceHint.classList.remove("opacity-0");
+                    priceHint.classList.add("opacity-100");
+                }
             });
+
+            // Trong lúc gõ, KHÔNG thay đổi value của input hiển thị để Unikey không bị mất dấu/loạn bộ đệm
+            priceDisplay.addEventListener("input", function (e) {
+                let rawValue = this.value.replace(/\D/g, "");
+                priceActual.value = rawValue;
+                
+                // Cập nhật thanh hint liên tục để người dùng đếm số 0
+                if (priceHint) {
+                    priceHint.textContent = (formatVND(rawValue) || "0") + " VNĐ";
+                }
+            });
+
+            // Khi gõ xong và click chuột ra ngoài (blur), mới định dạng mặt nạ có dấu chấm
+            priceDisplay.addEventListener("blur", function (e) {
+                let rawValue = this.value.replace(/\D/g, "");
+                if (!rawValue) {
+                    rawValue = "0";
+                }
+                priceActual.value = rawValue;
+                this.value = formatVND(rawValue);
+                
+                // Ẩn thanh hint
+                if (priceHint) {
+                    priceHint.classList.remove("opacity-100");
+                    priceHint.classList.add("opacity-0");
+                }
+            });
+
+            // Định dạng tiền tệ cho giá riêng của từng Size
+            const sizePriceDisplays = document.querySelectorAll(".size-price-display");
+            sizePriceDisplays.forEach(function (displayInput) {
+                const container = displayInput.closest('.relative');
+                const actualInput = container.querySelector(".size-price-actual");
+                const hintSpan = container.querySelector(".size-price-hint");
+
+                if (actualInput && actualInput.value && actualInput.value !== "0") {
+                    displayInput.value = formatVND(actualInput.value);
+                }
+
+                displayInput.addEventListener("focus", function () {
+                    let rawValue = this.value.replace(/\D/g, "");
+                    this.value = rawValue;
+                    
+                    if (hintSpan) {
+                        hintSpan.textContent = (formatVND(rawValue) || "0") + " đ";
+                        hintSpan.classList.remove("opacity-0");
+                        hintSpan.classList.add("opacity-100");
+                    }
+                });
+
+                displayInput.addEventListener("input", function () {
+                    let rawValue = this.value.replace(/\D/g, "");
+                    if (actualInput) actualInput.value = rawValue;
+                    
+                    if (hintSpan) {
+                        hintSpan.textContent = (formatVND(rawValue) || "0") + " đ";
+                    }
+                });
+
+                displayInput.addEventListener("blur", function () {
+                    let rawValue = this.value.replace(/\D/g, "");
+                    if (!rawValue) rawValue = "0";
+                    if (actualInput) actualInput.value = rawValue;
+                    this.value = rawValue === "0" ? "" : formatVND(rawValue);
+                    
+                    if (hintSpan) {
+                        hintSpan.classList.remove("opacity-100");
+                        hintSpan.classList.add("opacity-0");
+                    }
+                });
+            });
+        });
+
+        // 4. ĐỒNG BỘ: Logic lọc hiển thị các size khớp chuẩn theo CategoryId nguyên bản (Không reload)
+        document.addEventListener("DOMContentLoaded", function () {
+            const categorySelect = document.getElementById("CategoryId");
+            const sizeRows = document.querySelectorAll(".size-row");
+            const sizeSection = document.getElementById("size-section");
+
+            function filterSizesByCategoryId() {
+                const selectedCategoryId = categorySelect.value;
+
+                if (!selectedCategoryId) {
+                    if (sizeSection) sizeSection.style.display = "none";
+                } else {
+                    if (sizeSection) sizeSection.style.display = "block";
+                }
+
+                sizeRows.forEach(row => {
+                    const rowCategoryId = row.getAttribute("data-category");
+                    const checkbox = row.querySelector('input[type="checkbox"]');
+
+                    if (!selectedCategoryId) {
+                        row.style.display = "none";
+                        if (checkbox) checkbox.checked = false;
+                    }
+                    else if (selectedCategoryId === rowCategoryId) {
+                        row.style.display = "flex";
+                    }
+                    else {
+                        row.style.display = "none";
+                        if (checkbox) checkbox.checked = false;
+                    }
+                });
+            }
+
+            if (categorySelect) {
+                filterSizesByCategoryId();
+                
+                $('#CategoryId').select2({ width: '100%' });
+                $('#MaterialId').select2({ width: '100%' });
+                
+                $('#CategoryId').on("change", filterSizesByCategoryId);
+            }
         });
     </script>
 }

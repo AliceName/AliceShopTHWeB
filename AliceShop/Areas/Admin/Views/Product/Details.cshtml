@@ -1,10 +1,32 @@
-﻿@model AliceShop.Models.Product
+@model AliceShop.Models.Product
 
 @{
     ViewData["Title"] = Model?.Name ?? "Chi tiết sản phẩm";
 
     // Logic đường dẫn ảnh đại diện chính an toàn chống gãy thẻ img
     var mainImgUrl = string.IsNullOrEmpty(Model?.ImageUrl) ? "/images/placeholder.png" : Model.ImageUrl;
+
+    // Sắp xếp danh sách size từ nhỏ đến lớn để hiển thị ngăn nắp
+    var activeVariants = Model?.ProductSizeVariants?.OrderBy(v => v.ProductSize.SizeName).ToList() ?? new List<AliceShop.Models.ProductSizeVariant>();
+
+    // 🔥 LOGIC MỚI: Tự động nhận diện nhãn hiển thị thông minh theo tên danh mục sản phẩm
+    string sizeLabel = "Kích cỡ / Size";
+    if (Model?.Category != null)
+    {
+        string cateName = Model.Category.Name.ToLower();
+        if (cateName.Contains("nhẫn") || cateName.Contains("nhan"))
+        {
+            sizeLabel = "Chọn kích cỡ nhẫn (Size)";
+        }
+        else if (cateName.Contains("dây") || cateName.Contains("chuỗi") || cateName.Contains("day chuyen"))
+        {
+            sizeLabel = "Chọn chiều dài chuỗi dây";
+        }
+        else if (cateName.Contains("lắc") || cateName.Contains("vòng") || cateName.Contains("lac") || cateName.Contains("vong"))
+        {
+            sizeLabel = "Chọn kích cỡ vòng / lắc tay";
+        }
+    }
 }
 
 <main class="animate-fadeIn max-w-[1440px] mx-auto px-6 md:px-20">
@@ -12,14 +34,13 @@
         <nav class="flex items-center gap-2 font-semibold text-xs text-secondary uppercase tracking-widest">
             <a class="hover:text-primary no-underline transition-colors" asp-controller="Home" asp-action="Index">Trang chủ</a>
             <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-            <a class="hover:text-primary no-underline transition-colors" asp-action="Collection">Sản phẩm</a>
+            <a class="hover:text-primary no-underline transition-colors" asp-controller="Product" asp-action="Collection">Sản phẩm</a>
             <span class="material-symbols-outlined text-[14px]">chevron_right</span>
             <span class="text-on-surface">@Model?.Name</span>
         </nav>
     </section>
 
     <section class="grid grid-cols-1 md:grid-cols-12 gap-16 pb-20">
-
         <div class="md:col-span-7 flex flex-col gap-6">
             <div class="aspect-[4/5] overflow-hidden bg-surface-container-low group rounded-lg border border-outline-variant/10 shadow-sm relative">
                 <img src="@mainImgUrl" alt="@Model?.Name" id="focused-main-img" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
@@ -42,26 +63,17 @@
                         }
                     }
                 }
-                else
-                {
-                    <div class="aspect-square bg-surface-container-low overflow-hidden cursor-pointer opacity-60 hover:opacity-100 border border-transparent rounded-md shadow-sm thumb-div transition-all duration-300" onclick="switchDetailImage('/images/placeholder.png', this)">
-                        <img src="/images/placeholder.png" class="w-full h-full object-cover" alt="Sample Thumb 1" />
-                    </div>
-                    <div class="aspect-square bg-surface-container-low overflow-hidden cursor-pointer opacity-60 hover:opacity-100 border border-transparent rounded-md shadow-sm thumb-div transition-all duration-300" onclick="switchDetailImage('/images/placeholder.png', this)">
-                        <img src="/images/placeholder.png" class="w-full h-full object-cover" alt="Sample Thumb 2" />
-                    </div>
-                    <div class="aspect-square bg-surface-container-low overflow-hidden cursor-pointer opacity-60 hover:opacity-100 border border-transparent rounded-md shadow-sm thumb-div transition-all duration-300" onclick="switchDetailImage('/images/placeholder.png', this)">
-                        <img src="/images/placeholder.png" class="w-full h-full object-cover" alt="Sample Thumb 3" />
-                    </div>
-                }
             </div>
         </div>
 
-        <div class="md:col-span-5 flex flex-col gap-10 py-2 justify-start">
-            <div class="flex flex-col gap-4">
+        <div class="md:col-span-5 flex flex-col gap-8 py-2 justify-start">
+            <div class="flex flex-col gap-3">
                 <p class="font-semibold text-xs text-primary uppercase tracking-[0.2em] m-0">Sản phẩm tiêu biểu</p>
                 <h1 class="font-serif text-2xl md:text-3xl font-medium text-on-surface uppercase tracking-wide leading-tight m-0">@Model?.Name</h1>
-                <p class="font-sans text-xl font-bold text-primary m-0">@string.Format("{0:N0} ₫", Model?.Price)</p>
+
+                <p class="font-sans text-xl font-bold text-primary m-0" id="product-price-display">
+                    @string.Format("{0:N0} ₫", Model?.Price)
+                </p>
             </div>
 
             <div class="flex flex-col gap-4 border-t border-outline-variant/30 pt-6">
@@ -70,60 +82,87 @@
                 </p>
 
                 <div class="flex flex-wrap gap-2 pt-1">
-                    <span class="px-3 py-1 bg-surface-container-highest text-secondary text-[12px] font-semibold rounded-full uppercase tracking-tighter border border-outline-variant/30">
+                    <span class="px-3 py-1 bg-surface-container-low text-secondary text-[11px] font-bold rounded-full uppercase tracking-wider border border-outline-variant/30">
                         @(Model?.Category?.Name ?? "Trang sức")
                     </span>
-                    <span class="px-3 py-1 bg-surface-container-highest text-secondary text-[12px] font-semibold rounded-full uppercase tracking-tighter border border-outline-variant/30">
+                    <span class="px-3 py-1 bg-surface-container-low text-secondary text-[11px] font-bold rounded-full uppercase tracking-wider border border-outline-variant/30">
                         @(Model?.Material?.Name ?? "Cao cấp")
                     </span>
                 </div>
             </div>
 
-            <div class="flex flex-col gap-6 pt-2">
+            <form asp-controller="ShoppingCart" asp-action="AddToCart" method="post" class="m-0 p-0 flex flex-col gap-6">
+                <input type="hidden" name="productId" value="@Model?.Id" />
+                <input type="hidden" name="quantity" id="quantity-actual" value="1" />
+
                 <div>
-                    <p class="font-semibold text-xs text-on-surface uppercase tracking-widest mb-3">Chiều dài chuỗi dây / Size</p>
-                    <div class="flex gap-3" id="size-selector-container">
-                        <button type="button" class="px-6 py-2 border border-primary bg-primary text-white text-xs font-bold rounded-lg transition-all outline-none">40cm</button>
-                        <button type="button" class="px-6 py-2 border border-outline text-on-surface text-xs font-bold rounded-lg hover:border-primary transition-all RoyalSizeBtn outline-none">45cm</button>
-                        <button type="button" class="px-6 py-2 border border-outline text-on-surface text-xs font-bold rounded-lg hover:border-primary transition-all RoyalSizeBtn outline-none">50cm</button>
+                    <p class="font-semibold text-xs text-on-surface uppercase tracking-widest mb-3">@sizeLabel</p>
+
+                    <div class="flex flex-wrap gap-3" id="size-selector-container">
+                        @if (activeVariants.Any())
+                        {
+                            for (int i = 0; i < activeVariants.Count; i++)
+                            {
+                                var v = activeVariants[i];
+                                <label class="cursor-pointer select-none">
+                                    <input type="radio" name="sizeVariantId" value="@v.Id" class="sr-only peer" @(i == 0 ? "checked" : "")
+                                           data-price="@v.Price" data-formatted-price="@string.Format("{0:N0} ₫", v.Price)" />
+
+                                    <div class="px-5 py-2.5 border border-outline text-on-surface text-xs font-bold rounded-lg hover:border-primary transition-all bg-white peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary flex items-center justify-center min-w-[70px]">
+                                        @v.ProductSize.SizeName
+                                    </div>
+                                </label>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-xs text-amber-700 italic font-medium m-0">Tác phẩm này hiện tại đang tạm hết hàng ở mọi kích cỡ.</p>
+                        }
                     </div>
                 </div>
+
                 <div>
                     <p class="font-semibold text-xs text-on-surface uppercase tracking-widest mb-3">Số lượng</p>
-                    <div class="flex items-center border border-outline-variant w-fit rounded-lg bg-white">
-                        <button type="button" class="px-4 py-2 hover:bg-surface-container transition-colors flex items-center justify-center outline-none" onclick="modifyProductQty(-1)">
-                            <span class="material-symbols-outlined text-[20px]">remove</span>
+                    <div class="flex items-center border border-outline-variant w-fit rounded-lg bg-white overflow-hidden shadow-sm">
+                        <button type="button" class="px-4 py-2 hover:bg-surface-container-low transition-colors flex items-center justify-center outline-none border-none bg-transparent cursor-pointer" onclick="modifyProductQty(-1)">
+                            <span class="material-symbols-outlined text-[18px] font-bold">remove</span>
                         </button>
-                        <span id="display-quantity" class="px-6 py-2 font-body-md font-bold select-none">1</span>
-                        <button type="button" class="px-4 py-2 hover:bg-surface-container transition-colors flex items-center justify-center outline-none" onclick="modifyProductQty(1)">
-                            <span class="material-symbols-outlined text-[20px]">add</span>
+                        <span id="display-quantity" class="px-5 py-2 font-sans text-xs font-bold select-none min-w-[30px] text-center">1</span>
+                        <button type="button" class="px-4 py-2 hover:bg-surface-container-low transition-colors flex items-center justify-center outline-none border-none bg-transparent cursor-pointer" onclick="modifyProductQty(1)">
+                            <span class="material-symbols-outlined text-[18px] font-bold">add</span>
                         </button>
                     </div>
                 </div>
-            </div>
 
-            <div class="flex flex-col gap-4 pt-2 w-full">
-                <button type="button" class="w-full h-12 text-white font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-opacity-90 transition-all duration-300 flex items-center justify-center shadow-md cursor-pointer" style="background-color: #1a1c1b; border: 1px solid #1a1c1b;">
-                    Thêm vào giỏ hàng
-                </button>
-                <button type="button" class="w-full h-12 border text-on-surface font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-on-surface hover:text-white transition-all duration-300 flex items-center justify-center cursor-pointer" style="border-color: #1a1c1b; background-color: #ffffff;">
-                    Mua ngay
-                </button>
+                @if (activeVariants.Any())
+                {
+                    <div class="flex flex-col gap-3 pt-2 w-full">
+                        <button type="submit" class="w-full h-12 text-on-primary font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-opacity-90 transition-all duration-300 flex items-center justify-center shadow-md bg-primary border-none outline-none cursor-pointer">
+                            Thêm vào giỏ hàng
+                        </button>
+                        <button type="submit" asp-action="BuyNow" class="w-full h-12 border text-on-surface font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-on-background hover:text-white transition-all duration-300 flex items-center justify-center cursor-pointer bg-white" style="border-color: #1a1c1b;">
+                            Mua ngay tác phẩm
+                        </button>
+                    </div>
+                }
+            </form>
 
-                <div class="flex justify-between items-center pt-4 border-t border-outline-variant/20 text-xs font-bold tracking-wider mt-2">
-                    <a asp-action="Collection" class="text-on-surface hover:text-primary transition-all no-underline flex items-center gap-1"><span class="material-symbols-outlined text-sm">arrow_back</span> Quay lại cửa hàng</a>
-                    <a asp-action="Edit" asp-route-id="@Model?.Id" class="text-amber-700 hover:opacity-80 no-underline flex items-center gap-1"><span class="material-symbols-outlined text-sm">edit</span> Chỉnh sửa tác phẩm</a>
-                </div>
+            <div class="flex justify-between items-center pt-2 border-t border-outline-variant/20 text-xs font-bold tracking-wider">
+                <a asp-action="Collection" class="text-on-surface hover:text-primary transition-all no-underline flex items-center gap-1"><span class="material-symbols-outlined text-sm">arrow_back</span> Quay lại cửa hàng</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-id="@Model?.Id" class="text-amber-700 hover:opacity-80 no-underline flex items-center gap-1"><span class="material-symbols-outlined text-sm">edit</span> Chỉnh sửa tác phẩm</a>
+                }
             </div>
 
             <div class="grid grid-cols-2 gap-4 pt-4 border-t border-outline-variant/30">
                 <div class="flex items-center gap-3">
                     <span class="material-symbols-outlined text-primary">verified</span>
-                    <span class="text-[13px] font-medium uppercase tracking-tight text-on-surface-variant">Chứng nhận đá quý</span>
+                    <span class="text-[12px] font-bold uppercase tracking-tight text-on-surface-variant">Chứng nhận đá quý</span>
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="material-symbols-outlined text-primary">package_2</span>
-                    <span class="text-[13px] font-medium uppercase tracking-tight text-on-surface-variant">Hộp quà cao cấp</span>
+                    <span class="text-[12px] font-bold uppercase tracking-tight text-on-surface-variant">Hộp quà cao cấp</span>
                 </div>
             </div>
         </div>
@@ -132,11 +171,11 @@
     <section class="bg-surface-container-low/50 py-20 border-t border-outline-variant/30">
         <div class="max-w-4xl mx-auto flex flex-col gap-1">
             <details class="group py-6 border-b border-outline-variant/30" open>
-                <summary class="flex justify-between items-center cursor-pointer list-none outline-none font-label-md text-label-md uppercase tracking-widest text-on-surface select-none">
+                <summary class="flex justify-between items-center cursor-pointer list-none outline-none font-sans text-xs font-bold uppercase tracking-widest text-on-surface select-none">
                     <span>Chất liệu & Bảo quản</span>
                     <span class="material-symbols-outlined transition-transform duration-300 group-open:rotate-180">expand_more</span>
                 </summary>
-                <div class="pt-6 font-body-md text-on-surface-variant flex flex-col gap-4 text-justify leading-relaxed">
+                <div class="pt-6 font-body-md text-on-surface-variant flex flex-col gap-4 text-justify leading-relaxed text-sm font-medium">
                     <p>Sản phẩm này được chế tác từ vàng nguyên khối 18K hoặc bạc cao cấp với bề mặt được đánh bóng gương hoàn hảo. Mỗi chi tiết đều được các nghệ nhân của AliceStore tinh chỉnh thủ công để đảm bảo sự thoải mái tối đa khi đeo hàng ngày.</p>
                     <ul class="list-disc list-inside space-y-2 p-0 m-0">
                         <li>Lau chùi bằng vải mềm khô sau khi sử dụng.</li>
@@ -147,21 +186,21 @@
             </details>
 
             <details class="group py-6 border-b border-outline-variant/30">
-                <summary class="flex justify-between items-center cursor-pointer list-none outline-none font-label-md text-label-md uppercase tracking-widest text-on-surface select-none">
+                <summary class="flex justify-between items-center cursor-pointer list-none outline-none font-sans text-xs font-bold uppercase tracking-widest text-on-surface select-none">
                     <span>Giao hàng & Trả hàng</span>
                     <span class="material-symbols-outlined transition-transform duration-300 group-open:rotate-180">expand_more</span>
                 </summary>
-                <div class="pt-6 font-body-md text-on-surface-variant leading-relaxed text-justify">
+                <div class="pt-6 text-on-surface-variant leading-relaxed text-justify text-sm font-medium">
                     <p>Chúng tôi cung cấp dịch vụ giao hàng cao cấp miễn phí cho tất cả các đơn hàng trang sức trên 5,000,000₫. Đơn hàng sẽ được bảo hiểm toàn phần trong quá trình vận chuyển. Bạn có thể đổi trả sản phẩm trong vòng 14 ngày nếu chưa qua sử dụng và còn nguyên tem mác.</p>
                 </div>
             </details>
 
             <details class="group py-6 border-b border-outline-variant/30">
-                <summary class="flex justify-between items-center cursor-pointer list-none outline-none font-label-md text-label-md uppercase tracking-widest text-on-surface select-none">
+                <summary class="flex justify-between items-center cursor-pointer list-none outline-none font-sans text-xs font-bold uppercase tracking-widest text-on-surface select-none">
                     <span>Chính sách Bảo hành</span>
                     <span class="material-symbols-outlined transition-transform duration-300 group-open:rotate-180">expand_more</span>
                 </summary>
-                <div class="pt-6 font-body-md text-on-surface-variant leading-relaxed text-justify">
+                <div class="pt-6 text-on-surface-variant leading-relaxed text-justify text-sm font-medium">
                     <p>AliceStore cam kết bảo hành trọn đời cho việc làm mới sản phẩm và kiểm tra chấu đá. Bảo hành 2 năm cho bất kỳ lỗi kỹ thuật nào từ nhà sản xuất. Mỗi sản phẩm đi kèm một mã số định danh duy nhất để truy xuất nguồn gốc.</p>
                 </div>
             </details>
@@ -171,30 +210,42 @@
 
 @section Scripts {
     <script>
-        // 1. Logic tăng giảm số lượng
+        // 1. Logic tăng giảm số lượng mua
         function modifyProductQty(delta) {
             const qtyLabel = document.getElementById('display-quantity');
-            if (!qtyLabel) return;
+            const qtyActual = document.getElementById('quantity-actual');
+            if (!qtyLabel || !qtyActual) return;
+
             let currentVal = parseInt(qtyLabel.innerText) || 1;
             currentVal += delta;
             if (currentVal < 1) currentVal = 1;
+
             qtyLabel.innerText = currentVal;
+            qtyActual.value = currentVal;
         }
 
-        // 2. Logic kích hoạt chọn kích thước dây
-        const sizeButtons = document.querySelectorAll('#size-selector-container button');
-        sizeButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                sizeButtons.forEach(b => {
-                    b.classList.remove('bg-primary', 'text-white', 'border-primary');
-                    b.classList.add('border-outline', 'text-on-surface');
+        // 2. Logic cập nhật giá tiền theo Size được chọn động công khai
+        document.addEventListener('DOMContentLoaded', () => {
+            const sizeRadios = document.querySelectorAll('#size-selector-container input[type="radio"]');
+            const priceDisplay = document.getElementById('product-price-display');
+
+            // Thiết lập giá mặc định ban đầu theo size đầu tiên được chọn
+            const defaultChecked = document.querySelector('#size-selector-container input[type="radio"]:checked');
+            if (defaultChecked && priceDisplay) {
+                priceDisplay.innerText = defaultChecked.getAttribute('data-formatted-price');
+            }
+
+            // Lắng nghe hành vi thay đổi kích cỡ
+            sizeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.checked && priceDisplay) {
+                        priceDisplay.innerText = this.getAttribute('data-formatted-price');
+                    }
                 });
-                btn.classList.add('bg-primary', 'text-white', 'border-primary');
-                btn.classList.remove('border-outline', 'text-on-surface');
             });
         });
 
-        // 3. ĐỒNG BỘ TÊN HÀM: Đã sửa từ khóa lỗi thành "function" chuẩn mã nguồn JavaScript
+        // 3. Logic hoán đổi xem ảnh trong bộ sưu tập (Gallery)
         function switchDetailImage(targetPath, element) {
             const focusedImg = document.getElementById('focused-main-img');
             if (focusedImg) {

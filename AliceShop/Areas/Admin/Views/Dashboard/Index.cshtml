@@ -1,0 +1,336 @@
+@{
+    ViewData["Title"] = "Thống kê Doanh thu";
+    var chartLabels = System.Text.Json.JsonSerializer.Serialize(ViewBag.ChartLabels);
+    var chartData = System.Text.Json.JsonSerializer.Serialize(ViewBag.ChartData);
+    var categoryLabels = System.Text.Json.JsonSerializer.Serialize(ViewBag.CategoryLabels);
+    var categoryData = System.Text.Json.JsonSerializer.Serialize(ViewBag.CategoryData);
+    string currentFilter = ViewBag.CurrentFilter as string ?? "ThisMonth";
+}
+
+<!-- Page Header & Filters -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+    <div>
+        <h2 class="font-headline-lg text-4xl text-on-surface m-0 mb-2">Thống kê doanh thu</h2>
+        <p class="font-body-md text-on-surface-variant m-0">Phân tích chuyên sâu về hiệu suất kinh doanh của Alice Store.</p>
+    </div>
+    <div class="flex items-center bg-surface-container-high p-1 rounded-lg">
+        <a href="?filter=Today" class="px-4 py-2 font-label-md text-[12px] uppercase tracking-wider transition-colors no-underline @(currentFilter == "Today" ? "bg-surface-container-lowest text-primary shadow-sm rounded-md" : "text-on-surface-variant hover:text-primary")">Hôm nay</a>
+        <a href="?filter=ThisWeek" class="px-4 py-2 font-label-md text-[12px] uppercase tracking-wider transition-colors no-underline @(currentFilter == "ThisWeek" ? "bg-surface-container-lowest text-primary shadow-sm rounded-md" : "text-on-surface-variant hover:text-primary")">Tuần này</a>
+        <a href="?filter=ThisMonth" class="px-4 py-2 font-label-md text-[12px] uppercase tracking-wider transition-colors no-underline @(currentFilter == "ThisMonth" ? "bg-surface-container-lowest text-primary shadow-sm rounded-md" : "text-on-surface-variant hover:text-primary")">Tháng này</a>
+    </div>
+</section>
+
+<!-- Metric Cards -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+    <!-- Total Revenue -->
+    <div class="bg-surface-container-lowest p-6 rounded-xl luxury-shadow border border-outline-variant/10">
+        <div class="flex justify-between items-start mb-4">
+            <div class="p-2 bg-[#ffdea5]/30 rounded-lg text-primary">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">payments</span>
+            </div>
+        </div>
+        <p class="font-label-md text-[12px] uppercase tracking-widest text-on-surface-variant mb-1 m-0">Tổng doanh thu</p>
+        <h3 class="font-headline-md text-[28px] text-on-surface m-0">@string.Format("{0:N0}đ", ViewBag.TotalRevenue)</h3>
+    </div>
+    
+    <!-- Average Order Value -->
+    <div class="bg-surface-container-lowest p-6 rounded-xl luxury-shadow border border-outline-variant/10">
+        <div class="flex justify-between items-start mb-4">
+            <div class="p-2 bg-[#e4e2e1] rounded-lg text-[#5f5e5e]">
+                <span class="material-symbols-outlined">shopping_bag</span>
+            </div>
+        </div>
+        <p class="font-label-md text-[12px] uppercase tracking-widest text-on-surface-variant mb-1 m-0">Giá trị/đơn trung bình</p>
+        <h3 class="font-headline-md text-[28px] text-on-surface m-0">@string.Format("{0:N0}đ", ViewBag.AverageOrderValue)</h3>
+    </div>
+    
+    <!-- Conversion Rate -->
+    <div class="bg-surface-container-lowest p-6 rounded-xl luxury-shadow border border-outline-variant/10">
+        <div class="flex justify-between items-start mb-4">
+            <div class="p-2 bg-[#e3e3df] rounded-lg text-[#5d5f5c]">
+                <span class="material-symbols-outlined">analytics</span>
+            </div>
+        </div>
+        <p class="font-label-md text-[12px] uppercase tracking-widest text-on-surface-variant mb-1 m-0">Tỷ lệ chuyển đổi</p>
+        <h3 class="font-headline-md text-[28px] text-on-surface m-0">@ViewBag.ConversionRate%</h3>
+    </div>
+    
+    <!-- Order Count -->
+    <div class="bg-surface-container-lowest p-6 rounded-xl luxury-shadow border border-outline-variant/10">
+        <div class="flex justify-between items-start mb-4">
+            <div class="p-2 bg-[#ffdea5] rounded-lg text-primary">
+                <span class="material-symbols-outlined">receipt_long</span>
+            </div>
+        </div>
+        <p class="font-label-md text-[12px] uppercase tracking-widest text-on-surface-variant mb-1 m-0">Số lượng đơn hàng</p>
+        <h3 class="font-headline-md text-[28px] text-on-surface m-0">@ViewBag.TotalOrders</h3>
+    </div>
+</section>
+
+<!-- Main Revenue Chart -->
+<section class="bg-surface-container-lowest p-8 rounded-xl luxury-shadow border border-outline-variant/10 mb-10">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h4 class="font-headline-md text-[24px] text-on-surface m-0 mb-1">Doanh thu theo thời gian</h4>
+            <p class="font-body-md text-sm text-on-surface-variant m-0">Biểu đồ biến động doanh thu (@(currentFilter == "Today" ? "hôm nay" : currentFilter == "ThisWeek" ? "trong tuần" : "trong tháng"))</p>
+        </div>
+        <button class="flex items-center gap-2 text-primary font-label-md text-[12px] uppercase tracking-widest hover:opacity-70 transition-opacity bg-transparent border-none cursor-pointer">
+            Tải báo cáo <span class="material-symbols-outlined text-sm">download</span>
+        </button>
+    </div>
+    <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
+        <canvas id="revenueChart"></canvas>
+    </div>
+</section>
+
+<!-- Secondary Section (Category & Top Products) -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
+    <!-- Revenue by Category -->
+    <div class="lg:col-span-5 bg-surface-container-lowest p-8 rounded-xl luxury-shadow border border-outline-variant/10">
+        <h4 class="font-headline-md text-[20px] text-on-surface mb-8 m-0">Doanh thu theo danh mục</h4>
+        <div class="flex flex-col items-center">
+            <div class="relative w-48 h-48 mb-8">
+                <canvas id="categoryChart"></canvas>
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <span class="material-symbols-outlined text-primary text-4xl">diamond</span>
+                </div>
+            </div>
+            <div class="w-full space-y-4">
+                @{ 
+                    var catLabels = ViewBag.CategoryLabels as List<string> ?? new List<string>();
+                    var catData = ViewBag.CategoryData as List<decimal> ?? new List<decimal>();
+                    var totalCatRevenue = catData.Sum();
+                    string[] catColors = { "#775a19", "#c5a059", "#e9c176", "#efeeec", "#dadad8" };
+                }
+                @for(int i = 0; i < catLabels.Count; i++)
+                {
+                    var percentage = totalCatRevenue > 0 ? (catData[i] / totalCatRevenue) * 100 : 0;
+                    var color = i < catColors.Length ? catColors[i] : "#7f7667";
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <span class="w-2 h-2 rounded-full" style="background-color: @color"></span>
+                            <span class="font-body-md text-on-surface">@catLabels[i]</span>
+                        </div>
+                        <span class="font-label-md text-on-surface">@string.Format("{0:N1}%", percentage)</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Selling Products -->
+    <div class="lg:col-span-7 bg-surface-container-lowest p-8 rounded-xl luxury-shadow border border-outline-variant/10 flex flex-col">
+        <div class="flex justify-between items-center mb-8">
+            <h4 class="font-headline-md text-[20px] text-on-surface m-0">Sản phẩm bán chạy nhất</h4>
+            <a href="#" class="text-[12px] font-label-md uppercase tracking-widest text-primary hover:underline no-underline">Xem tất cả</a>
+        </div>
+        <div class="space-y-6 flex-grow flex flex-col justify-center">
+            @foreach(var item in ViewBag.TopProducts)
+            {
+                <div class="flex items-center gap-4 group cursor-pointer">
+                    <div class="w-16 h-16 bg-surface-container-low rounded-lg overflow-hidden flex-shrink-0 border border-outline-variant/30">
+                        <img src="@item.ImageUrl" class="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                    </div>
+                    <div class="flex-1">
+                        <h5 class="font-body-md font-semibold text-on-surface group-hover:text-primary transition-colors m-0 mb-1">@item.Product.Name</h5>
+                        <p class="font-label-md text-[10px] text-on-surface-variant uppercase tracking-wider m-0">@item.CategoryName</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-label-md text-on-surface m-0 mb-1">@string.Format("{0:N0}đ", item.Revenue)</p>
+                        <p class="text-[10px] text-green-600 font-bold m-0">@item.TotalSold đơn vị</p>
+                    </div>
+                </div>
+            }
+            @if(ViewBag.TopProducts.Count == 0)
+            {
+                <div class="text-center text-on-surface-variant font-body-md py-4">Chưa có dữ liệu sản phẩm bán ra.</div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Bottom Data Table -->
+<section class="bg-surface-container-lowest rounded-xl luxury-shadow border border-outline-variant/10 overflow-hidden mb-10">
+    <div class="p-8 border-b border-outline-variant/10 flex justify-between items-center">
+        <h4 class="font-headline-md text-[24px] text-on-surface m-0">Phân tích hiệu suất sản phẩm</h4>
+        <div class="flex gap-4">
+            <button class="p-2 border border-outline-variant/30 rounded-lg hover:bg-surface-container-low transition-colors bg-transparent cursor-pointer flex items-center justify-center">
+                <span class="material-symbols-outlined text-on-surface-variant text-xl">filter_list</span>
+            </button>
+        </div>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left">
+            <thead class="bg-surface-container-low border-b border-outline-variant/10">
+                <tr>
+                    <th class="px-8 py-5 font-label-md text-[12px] uppercase tracking-widest text-on-surface-variant font-bold">Sản phẩm</th>
+                    <th class="px-8 py-5 font-label-md text-[12px] uppercase tracking-widest text-on-surface-variant font-bold">Danh mục</th>
+                    <th class="px-8 py-5 font-label-md text-[12px] uppercase tracking-widest text-on-surface-variant font-bold">Số lượng đã bán</th>
+                    <th class="px-8 py-5 font-label-md text-[12px] uppercase tracking-widest text-on-surface-variant font-bold">Doanh thu</th>
+                    <th class="px-8 py-5 font-label-md text-[12px] uppercase tracking-widest text-on-surface-variant font-bold">Trạng thái kho</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant/5">
+                @foreach(var item in ViewBag.ProductPerformance)
+                {
+                    <tr class="transition-colors hover:bg-primary/5">
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-surface-container rounded border border-outline-variant/10 overflow-hidden flex-shrink-0">
+                                    <img src="@item.ImageUrl" class="w-full h-full object-cover" />
+                                </div>
+                                <span class="font-body-md font-medium text-on-surface">@item.Product.Name</span>
+                            </div>
+                        </td>
+                        <td class="px-8 py-5">
+                            <span class="font-body-md text-sm text-on-surface-variant">@item.CategoryName</span>
+                        </td>
+                        <td class="px-8 py-5">
+                            <span class="font-body-md text-sm text-on-surface font-semibold">@item.TotalSold</span>
+                        </td>
+                        <td class="px-8 py-5">
+                            <span class="font-headline-md text-base font-semibold text-primary">@string.Format("{0:N0}đ", item.Revenue)</span>
+                        </td>
+                        <td class="px-8 py-5">
+                            @if(item.TotalStock > 0)
+                            {
+                                <span class="inline-flex px-3 py-1 bg-green-50 text-green-700 text-[10px] uppercase font-bold tracking-wider rounded-full border border-green-200">Còn hàng</span>
+                            }
+                            else
+                            {
+                                <span class="inline-flex px-3 py-1 bg-red-50 text-red-700 text-[10px] uppercase font-bold tracking-wider rounded-full border border-red-200">Hết hàng</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                @if(ViewBag.ProductPerformance.Count == 0)
+                {
+                    <tr>
+                        <td colspan="5" class="px-8 py-8 text-center text-on-surface-variant font-body-md">Chưa có dữ liệu giao dịch.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // ============================================
+            // 1. Line Chart (Revenue over time)
+            // ============================================
+            var lineCtx = document.getElementById("revenueChart").getContext('2d');
+            
+            // Create Gradient for Line Chart Background
+            var gradient = lineCtx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(197, 160, 89, 0.2)'); // #c5a059 with 20% opacity
+            gradient.addColorStop(1, 'rgba(197, 160, 89, 0)');
+
+            var lineChart = new Chart(lineCtx, {
+                type: 'line',
+                data: {
+                    labels: @Html.Raw(chartLabels),
+                    datasets: [{
+                        label: 'Doanh thu',
+                        data: @Html.Raw(chartData),
+                        borderColor: '#775a19',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#775a19',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        tension: 0.4 // Smooth curve similar to SVG
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#ffffff',
+                            titleColor: '#1a1c1b',
+                            bodyColor: '#4e4639',
+                            borderColor: '#d1c5b4',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Doanh thu: ' + context.parsed.y.toLocaleString() + ' đ';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Manrope', size: 10 }, color: '#a5a6a2' }
+                        },
+                        y: {
+                            grid: {
+                                color: '#d1c5b4',
+                                drawBorder: false,
+                                borderDash: [4, 4], // Dashed grid lines
+                                tickLength: 0
+                            },
+                            ticks: {
+                                font: { family: 'Manrope', size: 10 },
+                                color: '#a5a6a2',
+                                padding: 10,
+                                callback: function(value) {
+                                    if(value === 0) return '0';
+                                    return (value / 1000000).toLocaleString() + 'M';
+                                },
+                                maxTicksLimit: 6
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // ============================================
+            // 2. Doughnut Chart (Revenue by Category)
+            // ============================================
+            var catCtx = document.getElementById("categoryChart").getContext('2d');
+            var catChart = new Chart(catCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: @Html.Raw(categoryLabels),
+                    datasets: [{
+                        data: @Html.Raw(categoryData),
+                        backgroundColor: ['#775a19', '#c5a059', '#e9c176', '#efeeec', '#dadad8'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '80%', // Thin rings like the SVG
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#ffffff',
+                            bodyColor: '#1a1c1b',
+                            borderColor: '#d1c5b4',
+                            borderWidth: 1,
+                            padding: 10,
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.parsed.toLocaleString() + ' đ';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

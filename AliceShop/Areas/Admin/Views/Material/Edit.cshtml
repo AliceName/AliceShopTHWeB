@@ -1,34 +1,43 @@
 ﻿@model AliceShop.Models.Material
 
 @{
-    ViewData["Title"] = "Chỉnh sửa chất liệu";
+    ViewData["Title"] = "Chỉnh sửa chất liệu | AliceStore";
 }
 
-<main class="pt-12 pb-20 max-w-[1440px] mx-auto px-6 md:px-20 animate-fadeIn">
+<main class="pt-12 pb-20 max-w-[1440px] mx-auto px-6 md:px-20 animate-fadeIn font-sans">
+
     <header class="mb-12">
-        <span class="text-xs font-bold text-primary uppercase tracking-widest block mb-1">Chế độ quản trị viên</span>
-        <h1 class="font-serif text-3xl md:text-4xl text-on-surface mb-2 font-medium tracking-wide">Chỉnh sửa chất liệu</h1>
-        <p class="text-secondary font-sans text-sm">Cập nhật danh mục nguyên liệu, chất liệu quý hiếm chế tác trang sức cho mã số #@Model.Id.</p>
+        <span class="text-xs font-bold text-primary uppercase tracking-widest block mb-1 font-sans">Chế độ quản trị viên</span>
+        <h1 class="font-sans text-2xl md:text-3xl text-on-surface mb-2 font-bold uppercase tracking-wide">
+            Chỉnh sửa chất liệu
+        </h1>
+        <p class="text-on-surface-variant/80 font-sans text-sm font-medium">
+            Cập nhật danh mục nguyên liệu, chất liệu quý hiếm chế tác trang sức cho mã số #@Model.Id.
+        </p>
     </header>
 
-    <div class="max-w-2xl bg-surface-container-low p-8 md:p-10 rounded-lg border border-outline-variant/20 shadow-sm">
-        <form asp-action="Edit" method="post" autocomplete="off" class="space-y-8">
-            <div asp-validation-summary="ModelOnly" class="text-sm text-red-600 bg-red-50 p-3 rounded border border-red-200 hidden"></div>
+    <div class="max-w-2xl bg-white p-8 md:p-10 rounded-xl border border-outline-variant/30 shadow-[0_4px_20px_rgba(0,0,0,0.01)]">
+        <form asp-action="Edit" method="post" class="space-y-8">
+
+            <div asp-validation-summary="ModelOnly" class="text-xs font-semibold text-error bg-error-container/20 border border-error/20 p-4 rounded-md animate-fadeIn font-sans hidden" id="materialEditValidationSummary" role="alert"></div>
+
             <input type="hidden" asp-for="Id" />
 
-            <div class="space-y-2">
-                <label asp-for="Name" class="font-semibold text-xs uppercase tracking-widest text-on-surface-variant block mb-1">
-                    Tên chất liệu / Nguyên liệu chế tác <span class="text-red-600">*</span>
+            <div class="space-y-2 group">
+                <label asp-for="Name" class="block text-[10px] uppercase tracking-[0.15em] text-outline font-bold group-focus-within:text-primary transition-colors font-sans">
+                    Tên chất liệu / Nguyên liệu chế tác <span class="text-error">*</span>
                 </label>
-                <input asp-for="Name" class="w-full input-underline py-3 px-0 text-lg font-serif text-on-surface bg-transparent focus:ring-0 focus:outline-none" placeholder="Ví dụ: Vàng Ý 18K, Bạc Cao Cấp S925..." required />
-                <span asp-validation-for="Name" class="text-red-600 text-xs font-semibold mt-1 block"></span>
+
+                <input asp-for="Name" autocomplete="new-password" class="w-full bg-transparent border border-outline-variant focus:border-primary rounded-lg py-3 px-4 font-sans text-sm font-semibold text-on-background focus:ring-0 outline-none transition-colors placeholder:text-outline-variant/60"
+                       placeholder="Ví dụ: Vàng Ý 18K, Bạc Cao Cấp S925..." required />
+                <span asp-validation-for="Name" class="text-xs font-bold text-error mt-1 block font-sans"></span>
             </div>
 
-            <div class="pt-6 flex flex-col sm:flex-row gap-4 items-center">
-                <button type="submit" class="w-full sm:w-auto px-12 py-4 bg-on-background text-white font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-primary transition-colors shadow-sm cursor-pointer outline-none">
+            <div class="pt-4 border-t border-outline-variant/20 flex flex-col sm:flex-row gap-4 items-center">
+                <button type="submit" class="w-full sm:w-auto px-10 py-3.5 bg-primary text-on-primary font-sans text-xs uppercase tracking-widest rounded-lg transition-all duration-300 active:scale-[0.98] hover:bg-opacity-90 border-none outline-none shadow-md shadow-primary/10 font-bold cursor-pointer">
                     Lưu Thay Đổi
                 </button>
-                <a asp-action="Index" class="w-full sm:w-auto px-12 py-4 border border-outline text-on-surface font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-surface-container text-center no-underline transition-colors flex items-center justify-center">
+                <a asp-action="Index" class="w-full sm:w-auto px-10 py-3.5 border border-outline-variant text-on-surface font-sans text-xs uppercase tracking-widest rounded-lg hover:bg-surface-container-low text-center no-underline transition-all font-bold flex items-center justify-center bg-transparent box-border">
                     Hủy Cập Nhật
                 </a>
             </div>
@@ -40,4 +49,18 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Bộ điều khiển ẩn/hiện hộp lỗi tự động dựa trên số thẻ li phát sinh
+            const valSummary = document.getElementById('materialEditValidationSummary');
+            if (valSummary) {
+                const hasErrors = valSummary.querySelectorAll('li').length > 0;
+                if (hasErrors) {
+                    valSummary.classList.remove('hidden');
+                } else {
+                    valSummary.classList.add('hidden');
+                }
+            }
+        });
+    </script>
 }

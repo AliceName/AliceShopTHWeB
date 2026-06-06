@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model IndexModel
 @{
     ViewData["Title"] = "Tài khoản của tôi | AliceStore";
@@ -27,9 +27,14 @@
                     <span class="material-symbols-outlined text-xl">security</span>
                     <span class="font-label-md">Đổi mật khẩu</span>
                 </a>
-                <a class="flex items-center space-x-3 py-2.5 px-3 rounded-lg transition-all duration-300 text-on-surface-variant/40 no-underline font-semibold text-sm cursor-not-allowed" href="#orders">
+                <a class="flex items-center space-x-3 py-2.5 px-3 rounded-lg transition-all duration-300 text-on-surface-variant hover:text-primary hover:bg-surface-container-low/50 no-underline font-semibold text-sm" asp-area="" asp-controller="Profile" asp-action="Orders">
                     <span class="material-symbols-outlined text-xl">receipt_long</span>
                     <span class="font-label-md">Lịch sử đơn hàng</span>
+                </a>
+                
+                <a class="flex items-center space-x-3 py-2.5 px-3 rounded-lg transition-all duration-300 text-on-surface-variant hover:text-primary hover:bg-surface-container-low/50 no-underline font-semibold text-sm" asp-area="" asp-controller="Profile" asp-action="Index">
+                    <span class="material-symbols-outlined text-xl">location_on</span>
+                    <span class="font-label-md">Sổ địa chỉ</span>
                 </a>
 
                 <div class="pt-4 border-t border-outline-variant/30 mt-2">
@@ -52,7 +57,7 @@
                     <span class="text-[10px] font-bold text-primary uppercase tracking-widest bg-surface-container-low px-2.5 py-1 rounded-full">Secure Sync</span>
                 </div>
 
-                <form id="profile-form" method="post" class="space-y-8">
+                <form id="profile-form" method="post" enctype="multipart/form-data" class="space-y-8">
 
                     <!-- Partial thông báo trạng thái -->
                     <div class="animate-fadeIn">
@@ -61,11 +66,33 @@
 
                     <div asp-validation-summary="ModelOnly" class="text-xs font-semibold text-error bg-error-container/20 border border-error/20 p-4 rounded-md animate-fadeIn" role="alert"></div>
 
+                    <!-- Khu vực Ảnh đại diện -->
+                    <div class="flex items-center gap-6">
+                        <div class="relative group w-24 h-24 rounded-full overflow-hidden border-2 border-outline-variant bg-surface-container flex-shrink-0">
+                            <img id="avatar-preview" src="@(!string.IsNullOrEmpty(Model.Input.ExistingAvatarUrl) ? Model.Input.ExistingAvatarUrl : "https://ui-avatars.com/api/?name=" + Uri.EscapeDataString(Model.Username) + "&background=random")" class="w-full h-full object-cover" alt="Avatar">
+                            <label for="Input_AvatarFile" class="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                <span class="material-symbols-outlined text-2xl">photo_camera</span>
+                            </label>
+                        </div>
+                        <div class="space-y-1">
+                            <h3 class="font-bold text-sm text-on-surface">Ảnh đại diện</h3>
+                            <p class="text-xs text-on-surface-variant">Khuyến nghị ảnh vuông, tối đa 2MB</p>
+                            <input asp-for="Input.AvatarFile" type="file" class="hidden" accept="image/*" onchange="previewAvatar(event)">
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8">
                         <!-- Email Đăng nhập (Disabled bảo mật) -->
                         <div class="space-y-1.5 group">
                             <label asp-for="Username" class="block text-[10px] uppercase tracking-[0.15em] text-outline font-bold">Email / Tên đăng nhập</label>
                             <input asp-for="Username" class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg py-3 px-4 font-sans text-sm font-semibold text-on-surface-variant/70 cursor-not-allowed outline-none focus:ring-0" disabled />
+                        </div>
+
+                        <!-- Họ và tên -->
+                        <div class="space-y-1.5 group">
+                            <label asp-for="Input.FullName" class="block text-[10px] uppercase tracking-[0.15em] text-outline font-bold group-focus-within:text-primary transition-colors">Họ và tên</label>
+                            <input asp-for="Input.FullName" class="w-full bg-transparent border border-outline-variant focus:border-primary rounded-lg py-3 px-4 font-sans text-sm font-semibold text-on-background focus:ring-0 outline-none transition-colors placeholder:text-outline-variant/40" placeholder="Nhập họ và tên" />
+                            <span asp-validation-for="Input.FullName" class="text-xs font-bold text-error mt-1 block"></span>
                         </div>
 
                         <!-- Số điện thoại -->
@@ -98,5 +125,16 @@
                 valSummary.classList.add('hidden');
             }
         });
+
+        function previewAvatar(event) {
+            const input = event.target;
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatar-preview').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
     </script>
 }

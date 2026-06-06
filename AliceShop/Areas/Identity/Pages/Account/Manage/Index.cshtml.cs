@@ -1,4 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
@@ -10,6 +10,9 @@ using AliceShop.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace AliceShop.Areas.Identity.Pages.Account.Manage
 {
@@ -17,13 +20,16 @@ namespace AliceShop.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public IndexModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            IWebHostEnvironment webHostEnvironment)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         /// <summary>
@@ -57,8 +63,17 @@ namespace AliceShop.Areas.Identity.Pages.Account.Manage
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Phone]
-            [Display(Name = "Phone number")]
+            [Display(Name = "Số điện thoại")]
             public string PhoneNumber { get; set; }
+
+            [Required(ErrorMessage = "Vui lòng nhập họ và tên")]
+            [Display(Name = "Họ và tên")]
+            public string FullName { get; set; }
+
+            [Display(Name = "Ảnh đại diện")]
+            public IFormFile AvatarFile { get; set; }
+
+            public string ExistingAvatarUrl { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
@@ -70,7 +85,9 @@ namespace AliceShop.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                FullName = user.FullName,
+                ExistingAvatarUrl = user.AvatarUrl
             };
         }
 
@@ -106,13 +123,38 @@ namespace AliceShop.Areas.Identity.Pages.Account.Manage
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
                 if (!setPhoneResult.Succeeded)
                 {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
+                    StatusMessage = "Lỗi khi cập nhật số điện thoại.";
                     return RedirectToPage();
                 }
             }
 
+            if (user.FullName != Input.FullName)
+            {
+                user.FullName = Input.FullName;
+            }
+
+            if (Input.AvatarFile != null)
+            {
+                string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "avatars");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + Input.AvatarFile.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await Input.AvatarFile.CopyToAsync(fileStream);
+                }
+
+                user.AvatarUrl = "/images/avatars/" + uniqueFileName;
+            }
+
+            await _userManager.UpdateAsync(user);
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+            StatusMessage = "Thông tin cá nhân của bạn đã được cập nhật thành công.";
             return RedirectToPage();
         }
     }

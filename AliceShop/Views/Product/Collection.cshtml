@@ -25,7 +25,7 @@
                     {
                         <li>
                             <label class="flex items-center gap-3 cursor-pointer group m-0">
-                                <input class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer" type="checkbox" name="selectedCategories" value="@cat.Id">
+                                <input class="category-checkbox w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer" type="checkbox" name="selectedCategories" value="@cat.Id">
                                 <span class="text-sm text-on-surface-variant group-hover:text-primary transition-colors font-medium">@cat.Name</span>
                             </label>
                         </li>
@@ -60,10 +60,10 @@
             <div>
                 <h3 class="font-semibold text-sm uppercase tracking-widest mb-6 border-b border-outline-variant pb-2 text-on-background">Khoảng giá</h3>
                 <div class="space-y-4">
-                    <input class="w-full accent-primary h-1 bg-surface-container-high rounded-full appearance-none cursor-pointer outline-none" type="range" min="0" max="50000000" step="500000">
+                    <input id="price-range-slider" class="w-full accent-primary h-1 bg-surface-container-high rounded-full appearance-none cursor-pointer outline-none" type="range" min="0" max="100000000" step="500000" value="100000000">
                     <div class="flex justify-between text-xs text-on-surface-variant font-semibold tracking-wider">
                         <span>0 đ</span>
-                        <span>50.000.000 đ+</span>
+                        <span id="price-range-text" class="text-primary font-bold">100.000.000 đ</span>
                     </div>
                 </div>
             </div>
@@ -71,22 +71,20 @@
 
         <div class="flex-grow">
             <div class="flex justify-between items-center mb-10 text-on-surface-variant border-b pb-4 border-outline-variant/20">
-                <p class="text-sm font-medium m-0">Hiển thị <span class="font-bold text-on-background">@Model.Count()</span> sản phẩm trang sức</p>
+                <p class="text-sm font-medium m-0">Hiển thị <span id="product-count-display" class="font-bold text-on-background">@Model.Count()</span> sản phẩm trang sức</p>
                 <div class="flex items-center gap-2">
                     <span class="text-xs uppercase tracking-wider font-semibold">Sắp xếp:</span>
-                    <select class="bg-transparent border-none focus:ring-0 text-xs font-bold cursor-pointer text-on-background py-0 pr-8">
-                        <option>Mới nhất</option>
-                        <option>Giá tăng dần</option>
-                        <option>Giá giảm dần</option>
-                        <option>Phổ biến nhất</option>
+                    <select id="product-sort-select" class="bg-transparent border-none focus:ring-0 text-xs font-bold cursor-pointer text-on-background py-0 pr-8">
+                        <option value="newest">Mới nhất</option>
+                        <option value="price-asc">Giá tăng dần</option>
+                        <option value="price-desc">Giá giảm dần</option>
                     </select>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-y-16 gap-x-6">
+            <div id="product-grid-container" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-y-16 gap-x-6">
                 @foreach (var item in Model)
                 {
-                    // ĐỒNG BỘ ẢNH SQL: Ưu tiên bốc trường ImageUrl chính gốc từ SQL Server lên hiển thị trước
                     var productImg = "/images/placeholder.png";
                     if (!string.IsNullOrEmpty(item.ImageUrl))
                     {
@@ -94,16 +92,19 @@
                     }
                     else if (item.Images != null && item.Images.Any())
                     {
-                        // Nếu trường chính rỗng thì bốc tấm ảnh phụ đầu tiên trong bảng liên kết ProductImage
                         productImg = item.Images.First().Url;
                     }
 
-                    <div class="product-card group flex flex-col justify-between" style="cursor: default;">
+                    <div class="product-item-card product-card group flex flex-col justify-between"
+                         style="cursor: default;"
+                         data-category="@item.CategoryId"
+                         data-price="@((int)item.Price)"
+                         data-id="@item.Id">
                         <div>
                             <div class="relative aspect-[4/5] bg-surface-container-low overflow-hidden mb-6 rounded-lg border border-outline-variant/10 shadow-sm">
                                 <div class="absolute top-4 left-4 z-10 bg-primary text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-sm shadow-sm">Luxury</div>
 
-                                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="@productImg" alt="@item.Name" loading="lazy">
+                                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="@productImg" alt="@item.Name" loading="lazy" onerror="this.onerror=null; this.src='/images/placeholder.png';">
 
                                 <div class="product-action absolute bottom-0 left-0 w-full p-4 translate-y-4 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
                                     <a asp-action="Details" asp-route-id="@item.Id" class="w-full bg-on-background text-white py-3 font-semibold text-xs uppercase tracking-widest flex items-center justify-center gap-2 no-underline hover:bg-primary transition-colors rounded-md shadow-lg">
@@ -126,16 +127,13 @@
                 }
             </div>
 
-            @if (!Model.Any())
-            {
-                <div class="py-24 text-center text-on-surface-variant/60 italic text-sm border border-dashed rounded-xl border-outline-variant/50 mt-6 bg-white/50">
-                    <span class="material-symbols-outlined text-4xl block mb-3 text-outline-variant">search_off</span>
-                    Không tìm thấy sản phẩm trang sức nào phù hợp với từ khóa hoặc bộ lọc của bạn.
-                </div>
-            }
+            <div id="no-products-warning" class="py-24 text-center text-on-surface-variant/60 italic text-sm border border-dashed rounded-xl border-outline-variant/50 mt-6 bg-white/50 hidden">
+                <span class="material-symbols-outlined text-4xl block mb-3 text-outline-variant">search_off</span>
+                Không tìm thấy sản phẩm trang sức nào phù hợp với từ khóa hoặc bộ lọc của bạn.
+            </div>
 
             <div class="mt-24 flex flex-col items-center gap-6">
-                <button class="px-12 py-3.5 border border-on-surface text-on-surface font-semibold text-xs uppercase tracking-[0.2em] hover:bg-on-background hover:text-white transition-all duration-300 rounded-md bg-transparent">
+                <button class="px-12 py-3.5 border border-on-surface text-on-surface font-semibold text-xs uppercase tracking-[0.2em] hover:bg-on-background hover:text-white transition-all duration-300 rounded-md bg-transparent cursor-pointer outline-none">
                     Xem thêm sản phẩm
                 </button>
                 <div class="flex items-center gap-4 text-xs text-on-surface-variant font-bold tracking-widest">
@@ -147,3 +145,88 @@
         </div>
     </div>
 </main>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const checkboxes = document.querySelectorAll(".category-checkbox");
+            const priceSlider = document.getElementById("price-range-slider");
+            const priceText = document.getElementById("price-text");
+            const productCards = document.querySelectorAll(".product-item-card");
+            const countDisplay = document.getElementById("product-count-display");
+            const warningBox = document.getElementById("no-products-warning");
+            const sortSelect = document.getElementById("product-sort-select");
+            const gridContainer = document.getElementById("product-grid-container");
+
+            function filterProducts() {
+                // 1. Lấy danh sách các mã danh mục đang được tích chọn
+                const checkedCategories = Array.from(checkboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.value);
+
+                // 2. Lấy giá tiền tối đa từ thanh kéo slider
+                const maxPrice = parseInt(priceSlider.value);
+                priceText.innerText = new Intl.NumberFormat('vi-VN').format(maxPrice) + " đ";
+
+                let visibleCount = 0;
+
+                productCards.forEach(card => {
+                    const cardCategory = card.getAttribute("data-category");
+                    const cardPrice = parseInt(card.getAttribute("data-price"));
+
+                    // Logic kiểm tra điều kiện Danh mục
+                    const matchesCategory = checkedCategories.length === 0 || checkedCategories.includes(cardCategory);
+                    // Logic kiểm tra điều kiện Khoảng giá
+                    const matchesPrice = cardPrice <= maxPrice;
+
+                    if (matchesCategory && matchesPrice) {
+                        card.style.display = "flex";
+                        visibleCount++;
+                    } else {
+                        card.style.display = "none";
+                    }
+                });
+
+                // Cập nhật lại số lượng đếm sản phẩm hiển thị thực tế
+                countDisplay.innerText = visibleCount;
+
+                // Ẩn/hiện hộp cảnh báo trống hàng
+                if (visibleCount === 0) {
+                    warningBox.classList.remove("hidden");
+                } else {
+                    warningBox.classList.add("hidden");
+                }
+            }
+
+            // 🔥 LOGIC SẮP XẾP SẢN PHẨM THEO GIÁ VÀ ID (MỚI NHẤT) ĐỘNG KHÔNG RELOAD
+            function sortProducts() {
+                const sortType = sortSelect.value;
+                const cardsArray = Array.from(productCards);
+
+                cardsArray.sort((a, b) => {
+                    const priceA = parseInt(a.getAttribute("data-price"));
+                    const priceB = parseInt(b.getAttribute("data-price"));
+                    const idA = parseInt(a.getAttribute("data-id"));
+                    const idB = parseInt(b.getAttribute("data-id"));
+
+                    if (sortType === "price-asc") return priceA - priceB;
+                    if (sortType === "price-desc") return priceB - priceA;
+                    if (sortType === "newest") return idB - idA; // Sắp xếp ID lớn xếp trước
+                    return 0;
+                });
+
+                // Append lại thứ tự mảng đã sắp xếp vào trong khung chứa Grid HTML
+                cardsArray.forEach(card => gridContainer.appendChild(card));
+            }
+
+            // Lắng nghe sự kiện thay đổi trên các ô checkbox danh mục và thanh slider khoảng giá
+            checkboxes.forEach(cb => cb.addEventListener("change", filterProducts));
+            priceSlider.addEventListener("input", filterProducts);
+            sortSelect.addEventListener("change", sortProducts);
+
+            // Chạy khởi tạo ban đầu khi trang vừa tải xong
+            filterProducts();
+            sortProducts();
+        });
+    </script>
+}

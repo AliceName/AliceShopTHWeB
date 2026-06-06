@@ -44,6 +44,8 @@ namespace AliceShop.Controllers
             var product = await _productRepository.GetByIdAsync(id.Value);
             if (product == null) return NotFound();
 
+            ViewBag.CategoriesList = await _categoryRepository.GetAllAsync();
+
             return View(product);
         }
     }

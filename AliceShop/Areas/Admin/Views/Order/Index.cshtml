@@ -1,0 +1,120 @@
+@model IEnumerable<AliceShop.Models.Order>
+
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+}
+
+<div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+        <h2 class="font-headline-md text-2xl font-bold text-on-surface m-0">Quản lý Đơn hàng</h2>
+        <p class="font-label-md text-xs text-on-surface-variant uppercase tracking-widest mt-1 m-0">Theo dõi và cập nhật trạng thái các đơn hàng</p>
+    </div>
+    
+    <form method="get" class="flex items-center gap-3 bg-white border border-outline-variant/50 rounded-md px-3 py-2 shadow-sm">
+        <label class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider mb-0 flex items-center gap-2">
+            <span class="material-symbols-outlined text-base">filter_list</span>
+            Lọc:
+        </label>
+        <select name="status" class="bg-transparent border-none text-sm font-body-md text-on-surface p-0 focus:ring-0 cursor-pointer outline-none" onchange="this.form.submit()">
+            <option value="All" selected="@(ViewBag.CurrentStatus == "All")">Tất cả</option>
+            <option value="Pending" selected="@(ViewBag.CurrentStatus == "Pending")">Chờ xử lý</option>
+            <option value="Processing" selected="@(ViewBag.CurrentStatus == "Processing")">Đang xử lý</option>
+            <option value="Shipped" selected="@(ViewBag.CurrentStatus == "Shipped")">Đang giao</option>
+            <option value="Completed" selected="@(ViewBag.CurrentStatus == "Completed")">Đã hoàn thành</option>
+            <option value="Cancelled" selected="@(ViewBag.CurrentStatus == "Cancelled")">Đã hủy</option>
+        </select>
+    </form>
+</div>
+
+<div class="bg-white rounded-xl border border-outline-variant/30 shadow-[0_4px_20px_rgba(0,0,0,0.02)] overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse min-w-[800px]">
+            <thead>
+                <tr class="bg-surface-container-low border-b border-outline-variant/30">
+                    <th class="px-6 py-4 font-label-md text-xs text-on-surface-variant uppercase tracking-wider font-bold">Mã ĐH</th>
+                    <th class="px-6 py-4 font-label-md text-xs text-on-surface-variant uppercase tracking-wider font-bold">Khách hàng</th>
+                    <th class="px-6 py-4 font-label-md text-xs text-on-surface-variant uppercase tracking-wider font-bold">Ngày đặt</th>
+                    <th class="px-6 py-4 font-label-md text-xs text-on-surface-variant uppercase tracking-wider font-bold">Tổng tiền</th>
+                    <th class="px-6 py-4 font-label-md text-xs text-on-surface-variant uppercase tracking-wider font-bold">Trạng thái</th>
+                    <th class="px-6 py-4 font-label-md text-xs text-on-surface-variant uppercase tracking-wider font-bold text-right">Hành động</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant/10">
+                @foreach (var item in Model)
+                {
+                    <tr class="hover:bg-primary/5 transition-colors group">
+                        <td class="px-6 py-4 font-body-md text-sm font-semibold text-on-surface">
+                            #@item.Id.ToString("D5")
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="font-body-md text-sm font-medium text-on-surface">@item.FullName</div>
+                            <div class="font-label-md text-xs text-on-surface-variant mt-0.5">@item.PhoneNumber</div>
+                        </td>
+                        <td class="px-6 py-4 font-body-md text-sm text-on-surface-variant">
+                            @item.OrderDate.ToString("dd/MM/yyyy HH:mm")
+                        </td>
+                        <td class="px-6 py-4 font-headline-md text-base text-primary font-bold">
+                            @string.Format("{0:N0} ₫", item.TotalAmount)
+                        </td>
+                        <td class="px-6 py-4">
+                            @{
+                                string badgeBg = "bg-surface-variant/50";
+                                string badgeText = "text-on-surface";
+                                string statusText = item.Status;
+
+                                switch (item.Status?.ToLower())
+                                {
+                                    case "pending": 
+                                        badgeBg = "bg-[#c5a059]/10"; 
+                                        badgeText = "text-[#4e3700]"; 
+                                        statusText = "Chờ xử lý"; 
+                                        break;
+                                    case "processing": 
+                                        badgeBg = "bg-[#c5a059]/20"; 
+                                        badgeText = "text-[#4e3700]"; 
+                                        statusText = "Đang xử lý"; 
+                                        break;
+                                    case "shipped": 
+                                        badgeBg = "bg-[#a5a6a2]/20"; 
+                                        badgeText = "text-[#3a3c39]"; 
+                                        statusText = "Đang giao"; 
+                                        break;
+                                    case "completed": 
+                                        badgeBg = "bg-[#e4e2e1]/40"; 
+                                        badgeText = "text-[#474747]"; 
+                                        statusText = "Đã hoàn thành"; 
+                                        break;
+                                    case "cancelled": 
+                                        badgeBg = "bg-[#ffdad6]"; 
+                                        badgeText = "text-[#93000a]"; 
+                                        statusText = "Đã hủy"; 
+                                        break;
+                                }
+                            }
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider @badgeBg @badgeText">
+                                @statusText
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <a asp-action="Details" asp-route-id="@item.Id" 
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-outline-variant rounded-md text-xs font-bold uppercase tracking-wider text-on-surface hover:border-primary hover:text-primary transition-all no-underline">
+                                <span class="material-symbols-outlined text-[16px]">visibility</span>
+                                Chi tiết
+                            </a>
+                        </td>
+                    </tr>
+                }
+                
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center">
+                            <span class="material-symbols-outlined text-4xl text-outline-variant mb-2">inbox</span>
+                            <p class="font-body-md text-sm text-on-surface-variant m-0">Không tìm thấy đơn hàng nào.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

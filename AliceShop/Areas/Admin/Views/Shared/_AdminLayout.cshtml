@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="light" lang="vi">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>@(ViewData["Title"] ?? "Quản trị hệ thống") | AliceStore Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
@@ -68,12 +68,12 @@
                         "full": "0.75rem"
                     },
                     "fontFamily": {
-                        "headline-lg": ["Playfair Display"],
-                        "display-lg": ["Playfair Display"],
-                        "body-lg": ["Manrope"],
-                        "body-md": ["Manrope"],
-                        "label-md": ["Manrope"],
-                        "headline-md": ["Playfair Display"]
+                        "headline-lg": ["Lora", "serif"],
+                        "display-lg": ["Lora", "serif"],
+                        "body-lg": ["Inter", "sans-serif"],
+                        "body-md": ["Inter", "sans-serif"],
+                        "label-md": ["Inter", "sans-serif"],
+                        "headline-md": ["Lora", "serif"]
                     }
                 }
             }
@@ -111,6 +111,18 @@
         </a>
 
         <nav class="flex-grow space-y-1">
+            <a class="flex items-center gap-4 px-4 py-3 rounded-md transition-all duration-200 no-underline @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "text-primary border-r-2 border-primary bg-surface-container font-bold" : "text-on-surface-variant hover:text-primary hover:bg-surface-container/30")" 
+               asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                <span class="material-symbols-outlined">monitoring</span>
+                <span class="font-label-md text-xs uppercase tracking-wider">Thống kê Doanh Thu</span>
+            </a>
+
+            <a class="flex items-center gap-4 px-4 py-3 rounded-md transition-all duration-200 no-underline @(ViewContext.RouteData.Values["controller"]?.ToString() == "Order" ? "text-primary border-r-2 border-primary bg-surface-container font-bold" : "text-on-surface-variant hover:text-primary hover:bg-surface-container/30")" 
+               asp-area="Admin" asp-controller="Order" asp-action="Index">
+                <span class="material-symbols-outlined">local_shipping</span>
+                <span class="font-label-md text-xs uppercase tracking-wider">Đơn Hàng</span>
+            </a>
+
             <a class="flex items-center gap-4 px-4 py-3 rounded-md transition-all duration-200 no-underline @(ViewContext.RouteData.Values["controller"]?.ToString() == "Product" ? "text-primary border-r-2 border-primary bg-surface-container font-bold" : "text-on-surface-variant hover:text-primary hover:bg-surface-container/30")" 
                asp-area="Admin" asp-controller="Product" asp-action="Index">
                 <span class="material-symbols-outlined">inventory_2</span>
@@ -127,6 +139,12 @@
                asp-area="Admin" asp-controller="Material" asp-action="Index">
                 <span class="material-symbols-outlined">texture</span>
                 <span class="font-label-md text-xs uppercase tracking-wider">Chất Liệu</span>
+            </a>
+
+            <a class="flex items-center gap-4 px-4 py-3 rounded-md transition-all duration-200 no-underline @(ViewContext.RouteData.Values["controller"]?.ToString() == "User" ? "text-primary border-r-2 border-primary bg-surface-container font-bold" : "text-on-surface-variant hover:text-primary hover:bg-surface-container/30")" 
+               asp-area="Admin" asp-controller="User" asp-action="Index">
+                <span class="material-symbols-outlined">group</span>
+                <span class="font-label-md text-xs uppercase tracking-wider">Người Dùng</span>
             </a>
 
             <hr class="border-outline-variant/30 my-4" />

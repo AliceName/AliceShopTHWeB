@@ -27,9 +27,12 @@ namespace AliceShop.Repositories
         public async Task<Product?> GetByIdAsync(int id)
         {
             return await _context.Products
-                .Include(p => p.Category)  // Nạp kèm thông tin bảng danh mục cha
-                .Include(p => p.Material)  // Nạp kèm thông tin bảng chất liệu cha
-                .Include(p => p.Images)    // Ép EF Core JOIN bảng dữ liệu ProductImage con lên cùng sản phẩm
+                .Include(p => p.Category)   // Nạp thông tin danh mục cha
+                .Include(p => p.Material)   // Nạp thông tin chất liệu chế tác
+                .Include(p => p.Images)     // Nạp bộ sưu tập ảnh phụ con
+                                            // 🔥 NẠP LIÊN KẾT BIẾN THỂ SIZE VÀ TÊN SIZE ĐI KÈM
+                .Include(p => p.ProductSizeVariants)
+                    .ThenInclude(pv => pv.ProductSize)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 

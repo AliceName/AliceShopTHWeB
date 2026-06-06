@@ -1,0 +1,164 @@
+@model IEnumerable<AliceShop.Models.Order>
+
+@{
+    ViewData["Title"] = "Lịch sử đơn hàng | AliceStore";
+}
+
+<main class="flex-grow pt-12 pb-20 px-6 md:px-12 max-w-6xl mx-auto w-full animate-fadeIn">
+    <div class="flex flex-col md:flex-row gap-12 items-start">
+
+        <!-- SIDEBAR ĐIỀU HƯỚNG TÀI KHOẢN -->
+        <aside class="w-full md:w-60 flex-shrink-0 bg-white border border-outline-variant/20 rounded-xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.01)]">
+            <div class="mb-8">
+                <h1 class="font-serif text-2xl text-on-surface mb-1 font-medium tracking-wide">Tài khoản</h1>
+                <p class="text-on-surface-variant font-sans text-xs italic font-medium truncate">Chào mừng, @(User.Identity?.Name)</p>
+            </div>
+            <nav class="flex flex-col space-y-3">
+                <a class="flex items-center space-x-3 py-2.5 px-3 rounded-lg transition-all duration-300 text-on-surface-variant hover:text-primary hover:bg-surface-container-low/50 no-underline font-semibold text-sm" asp-area="Identity" asp-page="/Account/Manage/Index">
+                    <span class="material-symbols-outlined text-xl">person</span>
+                    <span class="font-sans">Thông tin cá nhân</span>
+                </a>
+                <a class="flex items-center space-x-3 py-2.5 px-3 rounded-lg transition-all duration-300 text-on-surface-variant hover:text-primary hover:bg-surface-container-low/50 no-underline font-semibold text-sm" asp-area="Identity" asp-page="/Account/Manage/ChangePassword">
+                    <span class="material-symbols-outlined text-xl">security</span>
+                    <span class="font-sans">Đổi mật khẩu</span>
+                </a>
+                
+                <a class="flex items-center space-x-3 py-2.5 px-3 rounded-lg transition-all duration-300 bg-surface-container-low text-primary no-underline font-semibold text-sm" asp-area="" asp-controller="Profile" asp-action="Orders">
+                    <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+                    <span class="font-sans">Lịch sử đơn hàng</span>
+                </a>
+
+                <a class="flex items-center space-x-3 py-2.5 px-3 rounded-lg transition-all duration-300 text-on-surface-variant hover:text-primary hover:bg-surface-container-low/50 no-underline font-semibold text-sm" asp-area="" asp-controller="Profile" asp-action="Index">
+                    <span class="material-symbols-outlined text-xl">location_on</span>
+                    <span class="font-sans">Sổ địa chỉ</span>
+                </a>
+
+                <div class="pt-4 border-t border-outline-variant/30 mt-2">
+                    <form class="form-inline inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+                        <button type="submit" class="w-full flex items-center space-x-3 py-2.5 px-3 text-left text-error hover:bg-red-50/50 rounded-lg transition-all bg-transparent border-none cursor-pointer outline-none font-semibold text-sm">
+                            <span class="material-symbols-outlined text-xl">logout</span>
+                            <span class="font-sans">Đăng xuất</span>
+                        </button>
+                    </form>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- KHU VỰC HIỂN THỊ LỊCH SỬ ĐƠN HÀNG -->
+        <div class="flex-grow bg-[#faf9f7] rounded-xl p-0 min-h-[500px]">
+            <!-- Header Section -->
+            <div class="mb-8">
+                <h2 class="font-serif text-[40px] leading-tight font-medium text-on-surface mb-2">Đơn hàng của bạn</h2>
+                <p class="font-sans text-[16px] text-on-surface-variant max-w-2xl">
+                    Theo dõi trạng thái và lịch sử các sản phẩm nghệ thuật độc bản bạn đã sở hữu tại AliceStore. 
+                    Mỗi đơn hàng là một phần của hành trình di sản chúng tôi kiến tạo.
+                </p>
+            </div>
+
+            <!-- Filters -->
+            <div class="flex gap-8 mb-8 border-b border-[#d1c5b4]/30 pb-4">
+                <button class="font-sans text-[14px] font-semibold text-primary border-b border-primary pb-4 -mb-[17px] tracking-wide">Tất cả (@Model.Count())</button>
+                <button class="font-sans text-[14px] font-semibold text-on-surface-variant hover:text-primary transition-colors pb-4 tracking-wide">Đang xử lý (@Model.Count(o => o.Status == "Pending" || o.Status == "Processing"))</button>
+                <button class="font-sans text-[14px] font-semibold text-on-surface-variant hover:text-primary transition-colors pb-4 tracking-wide">Hoàn thành (@Model.Count(o => o.Status == "Completed"))</button>
+            </div>
+
+            <!-- Order List -->
+            @if (!Model.Any())
+            {
+                <!-- Empty State Message -->
+                <div class="mt-16 p-12 bg-[#f4f3f1] border border-dashed border-[#d1c5b4]/50 flex flex-col items-center text-center">
+                    <span class="material-symbols-outlined text-4xl text-[#7f7667] mb-4">auto_awesome</span>
+                    <h3 class="font-serif text-[28px] font-medium text-primary mb-2">Trải nghiệm cá nhân hóa</h3>
+                    <p class="font-sans text-[16px] text-[#4e4639] max-w-md mb-6">
+                        Bạn chưa tìm thấy sản phẩm ưng ý? Hãy khám phá dịch vụ thiết kế Bespoke dành riêng cho gu thẩm mỹ của bạn.
+                    </p>
+                    <a asp-controller="Product" asp-action="Collection" class="bg-[#775a19] text-white px-8 py-3 font-sans text-[14px] font-semibold uppercase tracking-widest hover:opacity-90 transition-all rounded-sm no-underline inline-block">
+                        Khám phá bộ sưu tập
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="bg-white rounded-sm overflow-hidden border border-[#d1c5b4]/30">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-[#f4f3f1] border-b border-[#d1c5b4]/30">
+                                <th class="px-8 py-5 font-sans text-[14px] font-semibold text-[#4e4639] uppercase tracking-wider">Mã đơn hàng</th>
+                                <th class="px-8 py-5 font-sans text-[14px] font-semibold text-[#4e4639] uppercase tracking-wider">Ngày đặt</th>
+                                <th class="px-8 py-5 font-sans text-[14px] font-semibold text-[#4e4639] uppercase tracking-wider">Trạng thái</th>
+                                <th class="px-8 py-5 font-sans text-[14px] font-semibold text-[#4e4639] uppercase tracking-wider">Tổng cộng</th>
+                                <th class="px-8 py-5 font-sans text-[14px] font-semibold text-[#4e4639] uppercase tracking-wider text-right">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#d1c5b4]/10">
+                            @foreach(var order in Model)
+                            {
+                                <tr class="order-table-row transition-colors hover:bg-[#775a19]/5">
+                                    <td class="px-8 py-6 font-sans text-[16px] text-on-surface font-medium">#ORD-@order.Id.ToString("D4")</td>
+                                    <td class="px-8 py-6 font-sans text-[16px] text-on-surface-variant">@order.OrderDate.ToString("dd MMMM, yyyy")</td>
+                                    <td class="px-8 py-6">
+                                        @{
+                                            string statusBgClass = "bg-[#e4e2e1]/20 text-[#474747]";
+                                            string dotClass = "bg-[#5f5e5e]";
+                                            string statusLabel = "Chờ xử lý";
+
+                                            switch (order.Status?.ToLower())
+                                            {
+                                                case "pending":
+                                                case "processing":
+                                                    statusBgClass = "bg-[#c5a059]/10 text-[#4e3700]"; 
+                                                    dotClass = "bg-[#775a19]"; 
+                                                    statusLabel = "Đang xử lý"; 
+                                                    break;
+                                                case "shipped":
+                                                    statusBgClass = "bg-[#a5a6a2]/10 text-[#3a3c39]"; 
+                                                    dotClass = "bg-[#5d5f5c]"; 
+                                                    statusLabel = "Đang giao hàng"; 
+                                                    break;
+                                                case "completed":
+                                                    statusBgClass = "bg-[#e4e2e1]/20 text-[#474747]"; 
+                                                    dotClass = "bg-[#5f5e5e]"; 
+                                                    statusLabel = "Hoàn thành"; 
+                                                    break;
+                                                case "cancelled":
+                                                    statusBgClass = "bg-[#ffdad6]/20 text-[#93000a]"; 
+                                                    dotClass = "bg-[#ba1a1a]"; 
+                                                    statusLabel = "Đã hủy"; 
+                                                    break;
+                                            }
+                                        }
+                                        <span class="inline-flex items-center gap-2 @statusBgClass px-3 py-1 rounded-full text-[12px] font-semibold uppercase tracking-tighter">
+                                            <span class="w-2 h-2 rounded-full @dotClass"></span>
+                                            @statusLabel
+                                        </span>
+                                    </td>
+                                    <td class="px-8 py-6 font-serif text-[28px] text-primary font-medium">@string.Format("{0:N0}₫", order.TotalAmount)</td>
+                                    <td class="px-8 py-6 text-right">
+                                        <a class="font-sans text-[14px] font-semibold text-on-surface hover:text-primary underline underline-offset-4 transition-all" href="#">Xem chi tiết</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const rows = document.querySelectorAll('.order-table-row');
+            rows.forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    row.style.transition = 'all 0.5s ease-out';
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+        });
+    </script>
+}

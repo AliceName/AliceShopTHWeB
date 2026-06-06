@@ -1,0 +1,180 @@
+@model IEnumerable<AliceShop.Models.UserAddress>
+
+@{
+    ViewData["Title"] = "Sổ địa chỉ | AliceStore";
+}
+
+<!-- Áp dụng Layout giống với Manage/Index.cshtml để đồng bộ "Phần Hồ Sơ" -->
+<main class="flex-grow pt-12 pb-20 px-6 md:px-12 max-w-6xl mx-auto w-full animate-fadeIn">
+    <div class="flex flex-col md:flex-row gap-12 items-start">
+
+        <!-- SIDEBAR ĐIỀU HƯỚNG TÀI KHOẢN -->
+        <aside class="w-full md:w-60 flex-shrink-0 bg-white border border-outline-variant/20 rounded-xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.01)]">
+            <div class="mb-8">
+                <h1 class="font-serif text-2xl text-on-surface mb-1 font-medium tracking-wide">Tài khoản</h1>
+                <p class="text-on-surface-variant font-sans text-xs italic font-medium truncate">Chào mừng, @(User.Identity?.Name)</p>
+            </div>
+            <nav class="flex flex-col space-y-3">
+                <a class="flex items-center space-x-3 py-2.5 px-3 rounded-lg transition-all duration-300 text-on-surface-variant hover:text-primary hover:bg-surface-container-low/50 no-underline font-semibold text-sm" asp-area="Identity" asp-page="/Account/Manage/Index">
+                    <span class="material-symbols-outlined text-xl">person</span>
+                    <span class="font-sans">Thông tin cá nhân</span>
+                </a>
+                <a class="flex items-center space-x-3 py-2.5 px-3 rounded-lg transition-all duration-300 text-on-surface-variant hover:text-primary hover:bg-surface-container-low/50 no-underline font-semibold text-sm" asp-area="Identity" asp-page="/Account/Manage/ChangePassword">
+                    <span class="material-symbols-outlined text-xl">security</span>
+                    <span class="font-sans">Đổi mật khẩu</span>
+                </a>
+                <a class="flex items-center space-x-3 py-2.5 px-3 rounded-lg transition-all duration-300 text-on-surface-variant hover:text-primary hover:bg-surface-container-low/50 no-underline font-semibold text-sm" asp-area="" asp-controller="Profile" asp-action="Orders">
+                    <span class="material-symbols-outlined text-xl">receipt_long</span>
+                    <span class="font-sans">Lịch sử đơn hàng</span>
+                </a>
+                
+                <!-- Tab Sổ Địa Chỉ Đang Active -->
+                <a class="flex items-center space-x-3 py-2.5 px-3 rounded-lg transition-all duration-300 bg-surface-container-low text-primary no-underline font-semibold text-sm" asp-area="" asp-controller="Profile" asp-action="Index">
+                    <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">location_on</span>
+                    <span class="font-sans">Sổ địa chỉ</span>
+                </a>
+
+                <div class="pt-4 border-t border-outline-variant/30 mt-2">
+                    <form class="form-inline inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+                        <button type="submit" class="w-full flex items-center space-x-3 py-2.5 px-3 text-left text-error hover:bg-red-50/50 rounded-lg transition-all bg-transparent border-none cursor-pointer outline-none font-semibold text-sm">
+                            <span class="material-symbols-outlined text-xl">logout</span>
+                            <span class="font-sans">Đăng xuất</span>
+                        </button>
+                    </form>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- KHU VỰC HIỂN THỊ SỔ ĐỊA CHỈ (Áp dụng UI được yêu cầu) -->
+        <div class="flex-grow bg-white border border-outline-variant/20 rounded-xl p-8 md:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.01)] min-h-[500px]">
+            
+            @if (TempData["success"] != null)
+            {
+                <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded relative font-sans text-sm">
+                    @TempData["success"]
+                </div>
+            }
+
+            <!-- Header Section -->
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                <div class="space-y-2">
+                    <h1 class="font-serif text-[32px] md:text-[40px] leading-tight font-medium text-on-surface m-0">Sổ địa chỉ</h1>
+                    <p class="font-sans text-[16px] md:text-[18px] text-[#5f5e5e] max-w-xl m-0">Quản lý thông tin nhận hàng để mua sắm thuận tiện hơn.</p>
+                </div>
+                <a asp-action="CreateAddress" class="group flex items-center justify-center space-x-2 h-[48px] px-8 border border-primary text-primary font-sans font-semibold text-[14px] hover:bg-primary hover:text-white transition-all duration-300 rounded-sm cursor-pointer bg-transparent uppercase tracking-wider no-underline">
+                    <span class="material-symbols-outlined text-[20px]">add</span>
+                    <span>Thêm địa chỉ mới</span>
+                </a>
+            </div>
+
+            <!-- Address Grid -->
+            <div class="grid grid-cols-1 gap-6">
+                
+                @if (!Model.Any())
+                {
+                    <div class="text-center py-10 text-[#5f5e5e] font-sans">
+                        Bạn chưa có địa chỉ nào. Hãy thêm một địa chỉ mới nhé.
+                    </div>
+                }
+
+                @foreach(var address in Model)
+                {
+                    <div class="bg-[#faf9f7] p-8 border @(address.IsDefault ? "border-primary/50" : "border-[#d1c5b4]/50") relative group transition-all duration-300 hover:border-primary/50">
+                        <div class="flex justify-between items-start mb-6 flex-col md:flex-row gap-4 md:gap-0">
+                            <div>
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h3 class="font-serif text-[20px] font-medium text-on-surface m-0">@address.FullName</h3>
+                                    @if(address.IsDefault)
+                                    {
+                                        <span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 tracking-wider rounded-sm uppercase">Mặc định</span>
+                                    }
+                                </div>
+                                <p class="font-sans text-[16px] text-[#5f5e5e] mb-4 m-0">@address.PhoneNumber</p>
+                                <p class="font-sans text-[16px] text-on-surface leading-relaxed max-w-md m-0">@address.DetailedAddress</p>
+                            </div>
+                            <div class="flex items-center space-x-6">
+                                
+                                @if(!address.IsDefault)
+                                {
+                                    <form asp-action="SetDefaultAddress" method="post" class="inline m-0">
+                                        <input type="hidden" name="id" value="@address.Id" />
+                                        <button type="submit" class="font-sans font-semibold text-[14px] tracking-wide text-on-surface-variant hover:text-primary transition-all bg-transparent border-none cursor-pointer p-0 opacity-0 group-hover:opacity-100">Đặt mặc định</button>
+                                    </form>
+                                }
+
+                                <button type="button" onclick="openEditModal(@address.Id, '@Html.Raw(address.FullName)', '@Html.Raw(address.PhoneNumber)', '@Html.Raw(address.DetailedAddress)', @address.IsDefault.ToString().ToLower())" class="font-sans font-semibold text-[14px] tracking-wide text-primary hover:underline transition-all bg-transparent border-none cursor-pointer p-0">Chỉnh sửa</button>
+                                
+                                <form asp-action="DeleteAddress" method="post" class="inline m-0">
+                                    <input type="hidden" name="id" value="@address.Id" />
+                                    <button type="submit" onclick="return confirm('Bạn có chắc chắn muốn xóa địa chỉ này?');" class="font-sans font-semibold text-[14px] tracking-wide text-red-600 hover:underline transition-all opacity-0 group-hover:opacity-100 bg-transparent border-none cursor-pointer p-0">Xóa</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+
+            <!-- Empty Space Illustration / Subtle Branding -->
+            <div class="mt-20 flex flex-col items-center justify-center py-12 border-t border-[#d1c5b4]/30">
+                <img alt="Minimalist Decor" class="w-32 h-32 object-cover rounded-full grayscale opacity-20 mb-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOkjLnBatf1ma1ROMWvzGRnNoZewk3WfplP0VBRGOPF-y6nUX__kcIKJvkF6P5IgkqCULWweCBMyNdIViGRgQCrse8FsKzayij5uUnIuZ1WFkDW06W4yFAJFVy_WnCkhrXFZ6fpccZTVZJXYCB-YRmcoXUXDEp7j-ukVcs_mAPUJ8Xf-6JJWmVAuEcAFiYU5xJAJSNEX58sU9TuAnrFI2GHdQVi0WFTBf5Lt7vEdYdNpDCgzf8xXxe-wLUj6YAxt3ZuOVeeaRwubA"/>
+                <p class="font-sans text-[16px] text-[#5f5e5e] italic m-0">"Đồ vật của bạn, hành trình của bạn."</p>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- Modal Thêm Địa Chỉ đã được chuyển sang trang riêng Create.cshtml -->
+
+<!-- Modal Sửa Địa Chỉ -->
+<div class="modal fade font-sans" id="editAddressModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-none rounded-xl shadow-lg">
+            <div class="modal-header border-b border-outline-variant/30 px-6 py-4">
+                <h5 class="modal-title font-serif font-bold text-xl text-on-surface tracking-wide">Cập Nhật Địa Chỉ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="EditAddress" method="post">
+                <input type="hidden" name="Id" id="editId" />
+                <div class="modal-body px-6 py-5 space-y-4">
+                    <div>
+                        <label class="font-bold text-xs uppercase tracking-widest text-[#5f5e5e] block mb-2">Họ Tên Người Nhận <span class="text-red-600">*</span></label>
+                        <input type="text" name="FullName" id="editFullName" class="w-full input-underline py-2 px-0 text-base font-sans text-on-surface font-semibold focus:ring-0 focus:outline-none bg-transparent" required />
+                    </div>
+                    <div>
+                        <label class="font-bold text-xs uppercase tracking-widest text-[#5f5e5e] block mb-2">Số Điện Thoại <span class="text-red-600">*</span></label>
+                        <input type="text" name="PhoneNumber" id="editPhone" class="w-full input-underline py-2 px-0 text-base font-sans text-on-surface font-semibold focus:ring-0 focus:outline-none bg-transparent" required />
+                    </div>
+                    <div>
+                        <label class="font-bold text-xs uppercase tracking-widest text-[#5f5e5e] block mb-2">Địa Chỉ Chi Tiết <span class="text-red-600">*</span></label>
+                        <textarea name="DetailedAddress" id="editAddress" rows="3" class="w-full input-underline py-2 px-0 text-base font-sans text-on-surface font-semibold focus:ring-0 focus:outline-none bg-transparent resize-none" required></textarea>
+                    </div>
+                    <div class="flex items-center gap-2 mt-2">
+                        <input type="checkbox" id="editIsDefault" name="IsDefault" value="true" class="w-4 h-4 text-primary rounded border-outline-variant focus:ring-primary">
+                        <label for="editIsDefault" class="text-sm text-[#5f5e5e] font-medium cursor-pointer">Đặt làm địa chỉ mặc định</label>
+                    </div>
+                </div>
+                <div class="modal-footer border-t border-outline-variant/30 px-6 py-4 flex justify-end gap-3">
+                    <button type="button" class="px-6 py-2 border border-outline-variant text-on-surface font-bold text-xs uppercase tracking-widest rounded hover:bg-surface-container transition-colors" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="px-6 py-2 bg-primary text-white font-bold text-xs uppercase tracking-widest rounded hover:bg-primary/90 transition-colors">Cập Nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openEditModal(id, fullName, phone, address, isDefault) {
+            document.getElementById('editId').value = id;
+            document.getElementById('editFullName').value = fullName;
+            document.getElementById('editPhone').value = phone;
+            document.getElementById('editAddress').value = address;
+            document.getElementById('editIsDefault').checked = isDefault;
+            
+            var editModal = new bootstrap.Modal(document.getElementById('editAddressModal'));
+            editModal.show();
+        }
+    </script>
+}

@@ -1,36 +1,81 @@
-﻿@model AliceShop.Models.Product
+@model AliceShop.Models.Product
 
 @{
     ViewData["Title"] = "Chỉnh sửa sản phẩm";
     var mainImgUrl = string.IsNullOrEmpty(Model?.ImageUrl) ? "/images/placeholder.png" : Model.ImageUrl;
 }
 
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container--default .select2-selection--single {
+            background-color: transparent !important;
+            border: none !important;
+            height: auto !important;
+            padding: 0.75rem 0 !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #1a1c1b !important;
+            padding-left: 0 !important;
+            font-weight: 600 !important;
+            font-size: 0.875rem !important;
+            font-family: "Inter", sans-serif !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            display: none !important;
+        }
+        .select2-dropdown {
+            border: 1px solid #d1c5b4 !important;
+            border-radius: 0.5rem !important;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important;
+            font-family: "Inter", sans-serif !important;
+            font-size: 0.875rem !important;
+        }
+        .select2-search__field {
+            border: 1px solid #d1c5b4 !important;
+            border-radius: 0.25rem !important;
+            padding: 0.5rem !important;
+            outline: none !important;
+        }
+        .select2-search__field:focus {
+            border-color: #775a19 !important;
+        }
+        .select2-results__option--highlighted[aria-selected] {
+            background-color: #775a19 !important;
+            color: white !important;
+        }
+        .select2-container {
+            width: 100% !important;
+        }
+    </style>
+}
+
 <main class="pt-12 pb-20 max-w-[1440px] mx-auto px-6 md:px-20 animate-fadeIn">
     <header class="mb-12">
-        <span class="text-xs font-bold text-primary uppercase tracking-widest block mb-1">Chế độ quản trị viên</span>
-        <h1 class="font-serif text-3xl md:text-4xl text-on-surface mb-2 font-medium tracking-wide">Chỉnh sửa tác phẩm</h1>
+        <span class="text-xs font-bold text-primary uppercase tracking-widest block mb-1 font-sans">Chế độ quản trị viên</span>
+        <h1 class="font-sans text-2xl md:text-3xl font-bold text-on-surface mb-2 tracking-wide">Chỉnh sửa tác phẩm</h1>
         <p class="text-secondary font-sans text-sm">Cập nhật thông số, hình ảnh và phân loại cho sản phẩm mã số #@Model.Id.</p>
     </header>
 
     <form asp-action="Edit" method="post" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-12 gap-12" autocomplete="off">
-        <div asp-validation-summary="ModelOnly" class="col-span-12 text-sm text-red-600 bg-red-50 p-3 rounded border border-red-200 hidden"></div>
+        <div asp-validation-summary="ModelOnly" class="col-span-12 text-sm text-red-600 bg-red-50 p-3 rounded border border-red-200 hidden font-sans"></div>
         <input type="hidden" asp-for="Id" />
 
         <div class="lg:col-span-5 space-y-8">
             <div class="bg-surface-container-low p-6 rounded-lg border border-outline-variant/20 shadow-sm">
-                <label class="font-semibold text-xs uppercase tracking-widest mb-4 block text-on-surface-variant">Ảnh đại diện chính</label>
+                <label class="font-bold text-xs uppercase tracking-widest mb-4 block text-on-surface-variant font-sans">Ảnh đại diện chính</label>
                 <div class="relative aspect-[4/5] w-full border-2 border-dashed border-outline-variant hover:border-primary transition-colors flex flex-col items-center justify-center cursor-pointer group bg-white rounded-lg overflow-hidden" id="drop-zone-main">
-                    <img src="@mainImgUrl" id="main-preview-img" class="absolute inset-0 w-full h-full object-cover rounded-md">
+                    <img src="@mainImgUrl" id="main-preview-img" class="absolute inset-0 w-full h-full object-cover rounded-md" onerror="this.onerror=null; this.src='/images/placeholder.png';">
                     <div class="absolute inset-0 bg-on-surface/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-md">
                         <span class="material-symbols-outlined text-white" style="font-size: 32px;">edit</span>
                     </div>
-                    <input type="file" name="imageFiles" id="main-image-input" accept="image/*" class="hidden" />
                 </div>
+                <input type="file" name="imageUrl" id="main-image-input" accept="image/*" class="hidden" />
             </div>
 
             <div class="bg-surface-container-low p-6 rounded-lg border border-outline-variant/20 shadow-sm">
-                <label class="font-semibold text-xs uppercase tracking-widest mb-2 block text-on-surface-variant">Album ảnh phụ hiện tại</label>
-                <p class="text-xs text-secondary mb-4">Nhấp vào biểu tượng thùng rác trên từng hình để đánh dấu xóa khỏi SQL Server.</p>
+                <label class="font-bold text-xs uppercase tracking-widest mb-2 block text-on-surface-variant font-sans">Album ảnh phụ hiện tại</label>
+                <p class="text-xs text-secondary mb-4 font-sans">Nhấp vào biểu tượng thùng rác trên từng hình để đánh dấu xóa khỏi SQL Server.</p>
 
                 <div class="grid grid-cols-3 gap-4 mb-6">
                     @if (Model.Images != null && Model.Images.Any())
@@ -38,8 +83,8 @@
                         foreach (var img in Model.Images)
                         {
                             <div class="relative aspect-square border border-outline-variant/40 rounded bg-white p-0.5 group overflow-hidden photo-sub-card" id="img-container-@img.Id">
-                                <img src="@img.Url" class="w-full h-full object-cover rounded-sm" />
-                                <button type="button" onclick="markImageForDeletion(@img.Id)" class="absolute inset-0 bg-red-900/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white outline-none">
+                                <img src="@img.Url" class="w-full h-full object-cover rounded-sm" onerror="this.onerror=null; this.src='/images/placeholder.png';" />
+                                <button type="button" onclick="markImageForDeletion(@img.Id)" class="absolute inset-0 bg-red-900/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white outline-none border-none cursor-pointer">
                                     <span class="material-symbols-outlined">delete</span>
                                 </button>
                             </div>
@@ -47,16 +92,16 @@
                     }
                     else
                     {
-                        <div class="col-span-3 py-6 text-center text-xs italic text-secondary border border-dashed rounded bg-white/50">
+                        <div class="col-span-3 py-6 text-center text-xs italic text-secondary border border-dashed rounded bg-white/50 font-sans">
                             Chưa có ảnh phụ nào được lưu.
                         </div>
                     }
                 </div>
 
-                <label class="font-semibold text-xs uppercase tracking-widest mb-3 block text-on-surface-variant">Tải lên thêm ảnh góc chụp mới</label>
+                <label class="font-bold text-xs uppercase tracking-widest mb-3 block text-on-surface-variant font-sans">Tải lên thêm ảnh góc chụp mới</label>
                 <div class="relative w-full border-2 border-dashed border-outline-variant hover:border-primary transition-colors flex flex-col items-center justify-center cursor-pointer group bg-white rounded-lg py-6" id="drop-zone-gallery">
                     <span class="material-symbols-outlined text-outline-variant group-hover:text-primary mb-1">add_photo_alternate</span>
-                    <p class="text-center text-xs text-secondary font-medium m-0">Bấm để đăng tải thêm ảnh phụ</p>
+                    <p class="text-center text-xs text-secondary font-medium m-0 font-sans">Bấm để đăng tải thêm ảnh phụ</p>
                     <input type="file" name="imageFiles" id="gallery-images-input" accept="image/*" multiple class="hidden" />
                 </div>
                 <div id="deletion-inputs-container"></div>
@@ -67,57 +112,96 @@
         <div class="lg:col-span-7 space-y-10">
             <section class="space-y-8">
                 <div>
-                    <label asp-for="Name" class="font-semibold text-xs uppercase tracking-widest text-on-surface-variant block mb-2">Tên sản phẩm trang sức <span class="text-red-600">*</span></label>
-                    <input asp-for="Name" class="w-full input-underline py-3 px-0 text-lg font-serif text-on-surface" placeholder="Ví dụ: Nhẫn Kim Cương Eternal Glow" required />
-                    <span asp-validation-for="Name" class="text-red-600 text-xs font-semibold mt-1 block"></span>
+                    <label asp-for="Name" class="font-bold text-xs uppercase tracking-widest text-on-surface-variant block mb-2 font-sans">Tên sản phẩm trang sức <span class="text-red-600">*</span></label>
+                    <input asp-for="Name" class="w-full input-underline py-3 px-0 text-base md:text-lg font-sans text-on-surface font-medium focus:outline-none bg-transparent" placeholder="Ví dụ: Nhẫn Kim Cương Eternal Glow" required />
+                    <span asp-validation-for="Name" class="text-red-600 text-xs font-semibold mt-1 block font-sans"></span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <label asp-for="CategoryId" class="font-semibold text-xs uppercase tracking-widest text-on-surface-variant block mb-2">Phân loại danh mục <span class="text-red-600">*</span></label>
+                        <label asp-for="CategoryId" class="font-bold text-xs uppercase tracking-widest text-on-surface-variant block mb-2 font-sans">Phân loại danh mục <span class="text-red-600">*</span></label>
                         <div class="relative border-b border-[#d1c5b4]">
-                            <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="w-full border-none bg-transparent py-3 px-0 text-sm text-on-surface cursor-pointer focus:ring-0 focus:outline-none" required>
+                            <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="w-full border-none bg-transparent py-3 px-0 text-sm text-on-surface font-sans font-semibold cursor-pointer focus:ring-0 focus:outline-none" required>
                             </select>
                             <span class="material-symbols-outlined absolute right-0 top-3 pointer-events-none text-on-surface-variant">expand_more</span>
                         </div>
-                        <span asp-validation-for="CategoryId" class="text-red-600 text-xs font-semibold mt-1 block"></span>
+                        <span asp-validation-for="CategoryId" class="text-red-600 text-xs font-semibold mt-1 block font-sans"></span>
                     </div>
 
                     <div>
-                        <label asp-for="MaterialId" class="font-semibold text-xs uppercase tracking-widest text-on-surface-variant block mb-2">Chất liệu chế tác <span class="text-red-600">*</span></label>
+                        <label asp-for="MaterialId" class="font-bold text-xs uppercase tracking-widest text-on-surface-variant block mb-2 font-sans">Chất liệu chế tác <span class="text-red-600">*</span></label>
                         <div class="relative border-b border-[#d1c5b4]">
-                            <select asp-for="MaterialId" asp-items="ViewBag.Materials" class="w-full border-none bg-transparent py-3 px-0 text-sm text-on-surface cursor-pointer focus:ring-0 focus:outline-none" required>
+                            <select asp-for="MaterialId" asp-items="ViewBag.Materials" class="w-full border-none bg-transparent py-3 px-0 text-sm text-on-surface font-sans font-semibold cursor-pointer focus:ring-0 focus:outline-none" required>
                             </select>
                             <span class="material-symbols-outlined absolute right-0 top-3 pointer-events-none text-on-surface-variant">expand_more</span>
                         </div>
-                        <span asp-validation-for="MaterialId" class="text-red-600 text-xs font-semibold mt-1 block"></span>
+                        <span asp-validation-for="MaterialId" class="text-red-600 text-xs font-semibold mt-1 block font-sans"></span>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <div class="flex justify-between items-end mb-2">
+                        <label class="font-bold text-xs uppercase tracking-widest text-on-surface-variant block m-0 font-sans">
+                            Giá niêm yết bán lẻ gốc (VNĐ) <span class="text-red-600">*</span>
+                        </label>
+                        <span id="price-hint" class="font-sans text-sm font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-md opacity-0 transition-opacity duration-300 pointer-events-none transform translate-y-1">0 VNĐ</span>
+                    </div>
+                    <input type="text" inputmode="numeric" id="price-display" class="w-full input-underline py-3 px-0 text-xl font-sans text-primary font-bold focus:ring-0 focus:outline-none bg-transparent" placeholder="0" required />
+                    <input type="hidden" asp-for="Price" id="price-actual" />
+                    <span asp-validation-for="Price" class="text-red-600 text-xs font-semibold mt-1 block font-sans"></span>
+                </div>
+
+                <div id="size-section" class="space-y-4 bg-surface-container-low/60 p-6 rounded-xl border border-outline-variant/30" style="display: none;">
+                    <h3 class="font-sans text-xs font-bold uppercase text-primary tracking-widest m-0 border-b border-outline-variant/20 pb-3">
+                        Cập nhật kích cỡ & Tồn kho sản phẩm
+                    </h3>
+                    <p class="text-[11px] text-on-surface-variant font-sans font-medium m-0 pb-1">Tích chọn để thêm/bớt kích cỡ áp dụng cho mẫu trang sức và cập nhật số lượng kho hiện tại.</p>
+
+                    <div class="space-y-2.5">
+                        @if (ViewBag.AvailableSizes != null)
+                        {
+                            var sizeList = (List<AliceShop.Areas.Admin.Controllers.SizeVariantInputModel>)ViewBag.AvailableSizes;
+                            for (int i = 0; i < sizeList.Count; i++)
+                            {
+                                <div class="size-row flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-white p-3 rounded-lg border border-outline-variant/20 hover:border-primary/30 transition-colors" data-category="@sizeList[i].CategoryId">
+
+                                    <label class="flex items-center gap-3 cursor-pointer select-none min-w-[110px] py-1">
+                                        <input type="checkbox" name="sizeVariants[@i].IsSelected" value="true" class="w-4 h-4 text-primary focus:ring-primary border-outline-variant rounded cursor-pointer" @(sizeList[i].IsSelected ? "checked" : "") />
+                                        <input type="hidden" name="sizeVariants[@i].ProductSizeId" value="@sizeList[i].ProductSizeId" />
+                                        <input type="hidden" name="sizeVariants[@i].SizeName" value="@sizeList[i].SizeName" />
+                                        <span class="font-sans text-xs font-bold text-on-background">@sizeList[i].SizeName</span>
+                                    </label>
+
+                                    <div class="relative w-full sm:w-auto flex items-center border border-outline-variant rounded-lg bg-transparent focus-within:border-primary transition-colors">
+                                        <span class="bg-surface-container-low px-2.5 py-1.5 text-[10px] font-bold text-outline uppercase tracking-wider font-sans rounded-l-lg">Giá riêng</span>
+                                        <input type="text" inputmode="numeric" class="size-price-display w-full sm:w-32 border-none p-1.5 text-xs font-bold text-primary focus:ring-0 outline-none bg-transparent font-sans" placeholder="0 (giá gốc)" />
+                                        <input type="hidden" name="sizeVariants[@i].Price" class="size-price-actual" value="@sizeList[i].Price" />
+                                        <span class="size-price-hint absolute -top-6 left-1/2 -translate-x-1/2 bg-primary/90 text-white text-[10px] font-bold px-2 py-0.5 rounded opacity-0 transition-opacity pointer-events-none whitespace-nowrap z-10">0 đ</span>
+                                    </div>
+
+                                    <div class="w-full sm:w-auto flex items-center border border-outline-variant rounded-lg overflow-hidden bg-transparent focus-within:border-primary transition-colors">
+                                        <span class="bg-surface-container-low px-2.5 py-1.5 text-[10px] font-bold text-outline uppercase tracking-wider font-sans">Tồn kho</span>
+                                        <input type="number" name="sizeVariants[@i].StockQuantity" value="@sizeList[i].StockQuantity" min="0" class="w-full sm:w-24 border-none p-1.5 text-xs font-semibold text-on-background focus:ring-0 outline-none bg-transparent font-sans" required />
+                                    </div>
+
+                                </div>
+                            }
+                        }
                     </div>
                 </div>
 
                 <div>
-                    <label class="font-semibold text-xs uppercase tracking-widest text-on-surface-variant block mb-2">
-                        Giá niêm yết bán lẻ (VNĐ) <span class="text-red-600">*</span>
-                    </label>
-
-                    <input type="text" id="price-display" class="w-full input-underline py-3 px-0 text-lg font-sans text-primary font-bold focus:ring-0 focus:outline-none" placeholder="0" required />
-
-                    <input type="hidden" asp-for="Price" id="price-actual" />
-
-                    <span asp-validation-for="Price" class="text-red-600 text-xs font-semibold mt-1 block"></span>
-                </div>
-
-                <div>
-                    <label asp-for="Description" class="font-semibold text-xs uppercase tracking-widest text-on-surface-variant block mb-2">Mô tả câu chuyện & thông số chi tiết</label>
-                    <textarea asp-for="Description" class="w-full input-underline py-3 px-0 text-sm text-on-surface resize-none font-medium text-justify" rows="6" placeholder="Nhập mô tả cảm hứng chế tác..."></textarea>
-                    <span asp-validation-for="Description" class="text-red-600 text-xs font-semibold mt-1 block"></span>
+                    <label asp-for="Description" class="font-bold text-xs uppercase tracking-widest text-on-surface-variant block mb-2 font-sans">Mô tả câu chuyện & thông số chi tiết</label>
+                    <textarea asp-for="Description" class="w-full input-underline py-3 px-0 text-sm text-on-surface resize-none font-sans font-medium text-justify bg-transparent focus:outline-none" rows="6" placeholder="Nhập mô tả cảm hứng chế tác..."></textarea>
+                    <span asp-validation-for="Description" class="text-red-600 text-xs font-semibold mt-1 block font-sans"></span>
                 </div>
             </section>
 
             <div class="pt-8 flex flex-col sm:flex-row gap-4 items-center">
-                <button class="w-full sm:w-auto px-12 py-4 bg-on-background text-white font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-primary transition-colors shadow-sm cursor-pointer" type="submit">
+                <button class="w-full sm:w-auto px-12 py-4 bg-on-background text-white font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-primary transition-colors shadow-sm cursor-pointer border border-transparent outline-none font-sans" type="submit">
                     Cập Nhật Tác Phẩm
                 </button>
-                <a asp-action="Index" class="w-full sm:w-auto px-12 py-4 border border-outline text-on-surface font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-surface-container text-center no-underline transition-colors">
+                <a asp-action="Index" class="w-full sm:w-auto px-12 py-4 border border-outline text-on-surface font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-surface-container text-center no-underline transition-colors flex items-center justify-center font-sans">
                     Hủy Cập Nhật
                 </a>
             </div>
@@ -129,6 +213,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
         // 1. Xử lý tương tác thay đổi/Đăng tải ảnh đại diện chính mới
@@ -154,11 +239,9 @@
         const deletionContainer = document.getElementById('deletion-inputs-container');
         function markImageForDeletion(imageId) {
             if (confirm("Bạn có chắc chắn muốn loại bỏ vĩnh viễn tấm ảnh phụ này?")) {
-                // Ẩn khối card ảnh trên UI
                 const targetCard = document.getElementById(`img-container-${imageId}`);
                 if (targetCard) targetCard.remove();
 
-                // Sinh thẻ input hidden gửi lên biến List<int>? removedImageIds của Controller
                 const hiddenInput = document.createElement('input');
                 hiddenInput.type = 'hidden';
                 hiddenInput.name = 'removedImageIds';
@@ -174,7 +257,7 @@
 
         dropZoneGallery.addEventListener('click', () => galleryInput.click());
         galleryInput.addEventListener('change', (e) => {
-            previewContainer.innerHTML = ''; // Làm sạch đợt preview trước
+            previewContainer.innerHTML = '';
             Array.from(e.target.files).forEach(file => {
                 if (file.type.startsWith('image/')) {
                     const reader = new FileReader();
@@ -189,33 +272,145 @@
             });
         });
 
-        // Thêm đoạn này vào bên trong vùng <script> dưới đáy trang Edit.cshtml của bạn
+        // 4. Mặt nạ định dạng tiền tệ VND chữ siêu nét, rõ ràng chống gõ nhầm số
         document.addEventListener("DOMContentLoaded", function () {
             const priceDisplay = document.getElementById("price-display");
             const priceActual = document.getElementById("price-actual");
+            const priceHint = document.getElementById("price-hint");
 
-            // 1. Hàm định dạng số thành chuỗi có dấu chấm phân cách (1000 -> 1.000)
             function formatVND(value) {
                 if (!value) return "";
-                return value.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                let integerPart = value.toString().split(/[.,]/)[0];
+                return integerPart.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
             }
 
-            // 2. Khi trang vừa tải: Đọc giá trị số cũ từ Model ra để hiển thị dạng VND lên input hiển thị
             if (priceActual && priceActual.value) {
                 priceDisplay.value = formatVND(priceActual.value);
             }
 
-            // 3. Khi Admin gõ phím thay đổi giá tiền
-            priceDisplay.addEventListener("input", function (e) {
-                // Loại bỏ mọi ký tự không phải là số
-                let rawValue = e.target.value.replace(/\D/g, "");
-
-                // Lưu giá trị số nguyên chất vào input ẩn để gửi về SQL Server
-                priceActual.value = rawValue;
-
-                // Cập nhật lại chuỗi hiển thị có dấu chấm phân cách lên màn hình
-                e.target.value = formatVND(rawValue);
+            // Khi bấm vào ô nhập, gỡ bỏ định dạng để gõ số thô -> Chống lỗi Unikey
+            priceDisplay.addEventListener("focus", function (e) {
+                let rawValue = this.value.replace(/\D/g, "");
+                this.value = rawValue;
+                
+                if (priceHint) {
+                    priceHint.textContent = (formatVND(rawValue) || "0") + " VNĐ";
+                    priceHint.classList.remove("opacity-0");
+                    priceHint.classList.add("opacity-100");
+                }
             });
+
+            // Trong lúc gõ, KHÔNG thay đổi value của input hiển thị để Unikey không bị mất dấu/loạn bộ đệm
+            priceDisplay.addEventListener("input", function (e) {
+                let rawValue = this.value.replace(/\D/g, "");
+                priceActual.value = rawValue;
+                
+                if (priceHint) {
+                    priceHint.textContent = (formatVND(rawValue) || "0") + " VNĐ";
+                }
+            });
+
+            // Khi gõ xong và click chuột ra ngoài (blur), mới định dạng mặt nạ có dấu chấm
+            priceDisplay.addEventListener("blur", function (e) {
+                let rawValue = this.value.replace(/\D/g, "");
+                if (!rawValue) {
+                    rawValue = "0";
+                }
+                priceActual.value = rawValue;
+                this.value = formatVND(rawValue);
+                
+                if (priceHint) {
+                    priceHint.classList.remove("opacity-100");
+                    priceHint.classList.add("opacity-0");
+                }
+            });
+
+            // Định dạng tiền tệ cho giá riêng của từng Size
+            const sizePriceDisplays = document.querySelectorAll(".size-price-display");
+            sizePriceDisplays.forEach(function (displayInput) {
+                const container = displayInput.closest('.relative');
+                const actualInput = container.querySelector(".size-price-actual");
+                const hintSpan = container.querySelector(".size-price-hint");
+
+                if (actualInput && actualInput.value && actualInput.value !== "0") {
+                    displayInput.value = formatVND(actualInput.value);
+                }
+
+                displayInput.addEventListener("focus", function () {
+                    let rawValue = this.value.replace(/\D/g, "");
+                    this.value = rawValue;
+                    
+                    if (hintSpan) {
+                        hintSpan.textContent = (formatVND(rawValue) || "0") + " đ";
+                        hintSpan.classList.remove("opacity-0");
+                        hintSpan.classList.add("opacity-100");
+                    }
+                });
+
+                displayInput.addEventListener("input", function () {
+                    let rawValue = this.value.replace(/\D/g, "");
+                    if (actualInput) actualInput.value = rawValue;
+                    
+                    if (hintSpan) {
+                        hintSpan.textContent = (formatVND(rawValue) || "0") + " đ";
+                    }
+                });
+
+                displayInput.addEventListener("blur", function () {
+                    let rawValue = this.value.replace(/\D/g, "");
+                    if (!rawValue) rawValue = "0";
+                    if (actualInput) actualInput.value = rawValue;
+                    this.value = rawValue === "0" ? "" : formatVND(rawValue);
+                    
+                    if (hintSpan) {
+                        hintSpan.classList.remove("opacity-100");
+                        hintSpan.classList.add("opacity-0");
+                    }
+                });
+            });
+        });
+
+        // 5. ĐỒNG BỘ: Bộ lọc hiển thị ẩn/hiện kích cỡ theo mã danh mục đã chọn cho trang Edit
+        document.addEventListener("DOMContentLoaded", function () {
+            const categorySelect = document.getElementById("CategoryId");
+            const sizeRows = document.querySelectorAll(".size-row");
+            const sizeSection = document.getElementById("size-section");
+
+            function filterSizesByCategoryId() {
+                const selectedCategoryId = categorySelect.value;
+
+                if (!selectedCategoryId) {
+                    if (sizeSection) sizeSection.style.display = "none";
+                } else {
+                    if (sizeSection) sizeSection.style.display = "block";
+                }
+
+                sizeRows.forEach(row => {
+                    const rowCategoryId = row.getAttribute("data-category");
+                    const checkbox = row.querySelector('input[type="checkbox"]');
+
+                    if (!selectedCategoryId) {
+                        row.style.display = "none";
+                        if (checkbox) checkbox.checked = false;
+                    }
+                    else if (selectedCategoryId === rowCategoryId) {
+                        row.style.display = "flex";
+                    }
+                    else {
+                        row.style.display = "none";
+                        if (checkbox) checkbox.checked = false;
+                    }
+                });
+            }
+
+            if (categorySelect) {
+                filterSizesByCategoryId();
+                
+                $('#CategoryId').select2({ width: '100%' });
+                $('#MaterialId').select2({ width: '100%' });
+                
+                $('#CategoryId').on("change", filterSizesByCategoryId);
+            }
         });
     </script>
 }
