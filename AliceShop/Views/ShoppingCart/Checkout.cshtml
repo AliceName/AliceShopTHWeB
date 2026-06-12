@@ -14,7 +14,10 @@
     <form asp-action="Checkout" method="post" class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start" autocomplete="off">
         @Html.AntiForgeryToken()
 
+        <!-- CỘT TRÁI: THÔNG TIN GIAO HÀNG & PHƯƠNG THỨC THANH TOÁN -->
         <div class="lg:col-span-7 space-y-8">
+
+            <!-- BLOCK 1: ĐỊA CHỈ NHẬN HÀNG -->
             <div class="bg-white p-6 md:p-8 rounded-xl border border-outline-variant/30 shadow-[0_4px_25px_rgba(0,0,0,0.01)] space-y-6">
                 <h3 class="text-xs font-bold uppercase tracking-widest text-primary m-0 border-b border-outline-variant/20 pb-3 flex justify-between items-center">
                     <span>Địa chỉ nhận trang sức cao cấp</span>
@@ -73,13 +76,78 @@
                 </div>
             </div>
 
+            <!-- 🔥 BLOCK 2: TÍCH HỢP PHƯƠNG THỨC THANH TOÁN ĐA DẠNG -->
+            <div class="bg-white p-6 md:p-8 rounded-xl border border-outline-variant/30 shadow-[0_4px_25px_rgba(0,0,0,0.01)] space-y-6">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-primary m-0 border-b border-outline-variant/20 pb-3">
+                    Phương thức thanh toán bảo mật
+                </h3>
+                <label class="flex items-start gap-4 p-4 border border-outline rounded-xl cursor-pointer hover:border-primary transition-all bg-white select-none relative group">
+                    <input type="radio" name="PaymentMethod" value="COD" class="sr-only peer" onchange="togglePaymentGuide(this)" />
+                    <div class="w-4 h-4 rounded-full border border-outline-variant flex items-center justify-center mt-1 flex-shrink-0 peer-checked:border-primary peer-checked:bg-primary after:content-[''] after:w-1.5 after:h-1.4 after:rounded-full after:bg-white transition-all"></div>
+                    <div class="flex-grow space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-xl text-on-surface-variant group-hover:text-primary transition-colors">local_shipping</span>
+                            <h4 class="text-sm font-bold text-on-background m-0">Thanh toán tiền mặt khi bàn giao (COD)</h4>
+                        </div>
+                        <p class="text-xs text-on-surface-variant font-medium m-0 leading-relaxed">Thanh toán trực tiếp bằng tiền mặt cho nhân viên chuyển phát Premium ngay khi kiểm tra và nhận hộp quà trang sức.</p>
+                    </div>
+                </label>
+                <div class="grid grid-cols-1 gap-4">
+                    <!-- 1. Thanh toán Chuyển khoản ngân hàng -->
+                    <label class="flex items-start gap-4 p-4 border border-outline rounded-xl cursor-pointer hover:border-primary transition-all bg-white select-none relative group">
+                        <input type="radio" name="PaymentMethod" value="BankTransfer" class="sr-only peer" checked onchange="togglePaymentGuide(this)" />
+                        <div class="w-4 h-4 rounded-full border border-outline-variant flex items-center justify-center mt-1 flex-shrink-0 peer-checked:border-primary peer-checked:bg-primary after:content-[''] after:w-1.5 after:h-1.4 after:rounded-full after:bg-white transition-all"></div>
+                        <div class="flex-grow space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-xl text-on-surface-variant group-hover:text-primary transition-colors">account_balance</span>
+                                <h4 class="text-sm font-bold text-on-background m-0">Chuyển khoản Ngân hàng (Qua mã QR)</h4>
+                            </div>
+                            <p class="text-xs text-on-surface-variant font-medium m-0 leading-relaxed">Quét mã VietQR tự động qua ứng dụng Mobile Banking của mọi ngân hàng để xử lý giao dịch lập tức.</p>
+                        </div>
+                    </label>
+
+                    <!-- 2. Thanh toán Thẻ tín dụng/Thẻ ghi nợ -->
+                    <label class="flex items-start gap-4 p-4 border border-outline rounded-xl cursor-pointer hover:border-primary transition-all bg-white select-none relative group">
+                        <input type="radio" name="PaymentMethod" value="CreditCard" class="sr-only peer" onchange="togglePaymentGuide(this)" />
+                        <div class="w-4 h-4 rounded-full border border-outline-variant flex items-center justify-center mt-1 flex-shrink-0 peer-checked:border-primary peer-checked:bg-primary after:content-[''] after:w-1.5 after:h-1.4 after:rounded-full after:bg-white transition-all"></div>
+                        <div class="flex-grow space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-xl text-on-surface-variant group-hover:text-primary transition-colors">credit_card</span>
+                                <h4 class="text-sm font-bold text-on-background m-0">Thẻ Quốc tế Credit / Debit Card</h4>
+                            </div>
+                            <p class="text-xs text-on-surface-variant font-medium m-0 leading-relaxed">Hỗ trợ các cổng thẻ phổ biến Visa, Mastercard, JCB bảo mật cao qua tiêu chuẩn PCI-DSS.</p>
+                        </div>
+                    </label>
+
+                    <!-- 3. Thanh toán qua Ví điện tử -->
+                    <label class="flex items-start gap-4 p-4 border border-outline rounded-xl cursor-pointer hover:border-primary transition-all bg-white select-none relative group">
+                        <input type="radio" name="PaymentMethod" value="EWallet" class="sr-only peer" onchange="togglePaymentGuide(this)" />
+                        <div class="w-4 h-4 rounded-full border border-outline-variant flex items-center justify-center mt-1 flex-shrink-0 peer-checked:border-primary peer-checked:bg-primary after:content-[''] after:w-1.5 after:h-1.4 after:rounded-full after:bg-white transition-all"></div>
+                        <div class="flex-grow space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-xl text-on-surface-variant group-hover:text-primary transition-colors">account_balance_wallet</span>
+                                <h4 class="text-sm font-bold text-on-background m-0">Ví điện tử thông minh (Momo / ZaloPay)</h4>
+                            </div>
+                            <p class="text-xs text-on-surface-variant font-medium m-0 leading-relaxed">Thanh toán một chạm cực nhanh thông qua kết nối liên kết trực tiếp ứng dụng ví của bạn.</p>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Khung chỉ dẫn chuyển khoản động -->
+                <div id="bank-transfer-guide" class="p-4 bg-surface-container-low rounded-xl border border-dashed border-outline-variant/60 space-y-2 animate-fadeIn text-xs text-on-surface-variant font-medium leading-relaxed">
+                    <p class="m-0 text-primary font-bold uppercase tracking-wide flex items-center gap-1"><span class="material-symbols-outlined text-sm">info</span> Hướng dẫn chuyển khoản:</p>
+                    <p class="m-0">Sau khi bấm nút **"Xác Nhận Đặt Hàng"**, hệ thống sẽ tạo vận đơn và hiển thị cổng quét mã VietQR mang giá trị số tiền hóa đơn chuẩn xác của bạn. Đơn hàng sẽ được chuyển trạng thái sang đã thanh toán tự động ngay khi tiền nổi về tài khoản hệ thống.</p>
+                </div>
+            </div>
+
             <div class="flex items-center justify-between pt-2">
-                <a asp-action="Index" class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-on-surface hover:text-primary transition-colors no-underline">
+                <a asp-controller="ShoppingCart" asp-action="Index" class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-on-surface hover:text-primary transition-colors no-underline">
                     <span class="material-symbols-outlined text-sm">arrow_back</span> Quay lại giỏ hàng
                 </a>
             </div>
         </div>
 
+        <!-- CỘT PHẢI: TÓM TẮT ĐƠN HÀNG & MÓN ĐỒ SỞ HỮU -->
         <div class="lg:col-span-5 bg-surface-container-low p-6 md:p-8 rounded-xl border border-outline-variant/30 space-y-6 shadow-sm">
             <h3 class="text-xs font-bold uppercase tracking-widest text-on-background m-0 border-b border-outline-variant/20 pb-4">
                 Tác phẩm sở hữu
@@ -133,6 +201,7 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
+        // 1. Đồng bộ tự động điền địa chỉ cũ từ Sổ địa chỉ của khách hàng
         function fillAddress(select) {
             var option = select.options[select.selectedIndex];
             if (option.value) {
@@ -143,6 +212,29 @@
                 document.getElementById('FullName').value = '';
                 document.getElementById('PhoneNumber').value = '';
                 document.getElementById('ShippingAddress').value = '';
+            }
+        }
+
+        // 2. 🔥 KHỐI MỚI: Bật/tắt nhãn hướng dẫn chuyển khoản động khi thay đổi radio chọn cổng thanh toán
+        function togglePaymentGuide(radio) {
+            const guideBox = document.getElementById('bank-transfer-guide');
+            if (!guideBox) return;
+
+            if (radio.value === 'BankTransfer') {
+                guideBox.classList.remove('hidden');
+            } else {
+                guideBox.classList.add('hidden');
+            }
+        }
+        function togglePaymentGuide(radio) {
+            const guideBox = document.getElementById('bank-transfer-guide');
+            if (!guideBox) return;
+
+            // Chỉ hiển thị khung hướng dẫn chuyển khoản nếu người dùng chọn đúng BankTransfer
+            if (radio.value === 'BankTransfer') {
+                guideBox.classList.remove('hidden');
+            } else {
+                guideBox.classList.add('hidden');
             }
         }
     </script>

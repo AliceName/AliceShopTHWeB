@@ -1,0 +1,104 @@
+﻿@model AliceShop.Models.Order
+@{
+    ViewData["Title"] = $"Chi tiết đơn hàng #{Model.Id.ToString("D5")} | AliceStore";
+
+    // Logic xác định chỉ số mốc thời gian để thắp sáng các nút trên Timeline
+    int currentStep = 1; // 1: Đã xác nhận, 2: Đã gửi hàng, 3: Đang vận chuyển, 4: Đã giao
+    if (Model.Status == "Processing") currentStep = 2;
+    if (Model.Status == "Shipping") currentStep = 3;
+    if (Model.Status == "Completed") currentStep = 4;
+    bool isCancelled = Model.Status == "Cancelled";
+}
+
+<div class="max-w-4xl mx-auto px-4 py-8 font-sans">
+    <div class="bg-white border border-outline-variant/30 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.02)] p-6 md:p-8">
+
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-outline-variant/30 pb-6 mb-8">
+            <div>
+                <h2 class="text-xl font-bold text-on-surface m-0 uppercase tracking-wide">Đơn hàng #@Model.Id.ToString("D5")</h2>
+                <p class="text-xs text-on-surface-variant m-0 mt-1">Ngày đặt: @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+            </div>
+            <a asp-action="History" class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-on-surface-variant hover:text-primary no-underline">
+                <span class="material-symbols-outlined text-[16px]">arrow_back</span> Quay lại lịch sử
+            </a>
+        </div>
+
+        @if (!isCancelled)
+        {
+            <div class="mb-12 py-4">
+                <div class="flex items-center justify-between relative w-full">
+                    <div class="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-surface-container-high z-0"></div>
+                    <div class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-primary transition-all duration-500 z-0"
+                         style="width: @((currentStep - 1) * 33.33)%;"></div>
+
+                    <div class="flex flex-col items-center z-10 bg-white px-2">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 @(currentStep >= 1 ? "bg-primary text-white border-primary" : "bg-white text-on-surface-variant border-outline-variant")">
+                            <span class="material-symbols-outlined text-sm">assignment_turned_in</span>
+                        </div>
+                        <span class="text-[10px] md:text-xs font-bold uppercase tracking-wider mt-2 @(currentStep >= 1 ? "text-primary" : "text-on-surface-variant")">Đã xác nhận</span>
+                    </div>
+
+                    <div class="flex flex-col items-center z-10 bg-white px-2">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 @(currentStep >= 2 ? "bg-primary text-white border-primary" : "bg-white text-on-surface-variant border-outline-variant")">
+                            <span class="material-symbols-outlined text-sm">package_2</span>
+                        </div>
+                        <span class="text-[10px] md:text-xs font-bold uppercase tracking-wider mt-2 @(currentStep >= 2 ? "text-primary" : "text-on-surface-variant")">Đã gửi hàng</span>
+                    </div>
+
+                    <div class="flex flex-col items-center z-10 bg-white px-2">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 @(currentStep >= 3 ? "bg-primary text-white border-primary" : "bg-white text-on-surface-variant border-outline-variant")">
+                            <span class="material-symbols-outlined text-sm">local_shipping</span>
+                        </div>
+                        <span class="text-[10px] md:text-xs font-bold uppercase tracking-wider mt-2 @(currentStep >= 3 ? "text-primary" : "text-on-surface-variant")">Đang di chuyển</span>
+                    </div>
+
+                    <div class="flex flex-col items-center z-10 bg-white px-2">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 @(currentStep >= 4 ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-on-surface-variant border-outline-variant")">
+                            <span class="material-symbols-outlined text-sm">task_alt</span>
+                        </div>
+                        <span class="text-[10px] md:text-xs font-bold uppercase tracking-wider mt-2 @(currentStep >= 4 ? "text-emerald-600" : "text-on-surface-variant")">Đã giao</span>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="mb-12 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center gap-3">
+                <span class="material-symbols-outlined">cancel</span>
+                <span class="text-xs font-bold uppercase tracking-wider">Đơn hàng này đã bị hủy bỏ và hoàn trả tài nguyên kho.</span>
+            </div>
+        }
+
+        <div class="space-y-4 mb-8">
+            <h4 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4 m-0">Chi tiết sản phẩm</h4>
+            @foreach (var detail in Model.OrderDetails)
+            {
+                <div class="flex items-center justify-between border-b border-outline-variant/10 pb-4">
+                    <div class="flex items-center gap-4">
+                        <img src="@(detail.ProductSizeVariant?.Product?.ImageUrl ?? "/images/placeholder.png")" class="w-14 h-14 object-cover rounded-lg border border-outline-variant/30" alt="">
+                        <div>
+                            <p class="text-sm font-bold text-on-surface m-0">@detail.ProductSizeVariant?.Product?.Name</p>
+                            <p class="text-xs text-on-surface-variant m-0 mt-0.5">Kích cỡ: @detail.ProductSizeVariant?.ProductSize?.SizeName x @detail.Quantity</p>
+                        </div>
+                    </div>
+                    <span class="text-sm font-bold text-primary">@string.Format("{0:N0} ₫", detail.Price * detail.Quantity)</span>
+                </div>
+            }
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-surface-container-low rounded-xl p-5 border border-outline-variant/30">
+            <div class="text-xs space-y-2">
+                <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold m-0">Địa chỉ giao hàng</p>
+                <p class="font-semibold text-on-surface m-0 leading-relaxed">@Model.FullName</p>
+                <p class="text-on-surface-variant m-0">@Model.PhoneNumber</p>
+                <p class="text-on-surface-variant m-0 leading-relaxed">@Model.ShippingAddress</p>
+            </div>
+            <div class="flex flex-col justify-end text-right">
+                <span class="text-xs text-on-surface-variant uppercase tracking-widest font-bold">Tổng thanh toán:</span>
+                <span class="text-2xl font-bold text-primary block mt-1">@string.Format("{0:N0} ₫", Model.TotalAmount)</span>
+                <span class="text-[10px] text-on-surface-variant italic mt-1 block">Tích lũy +@((int)(Model.TotalAmount / 100000)) điểm thưởng thành viên</span>
+            </div>
+        </div>
+
+    </div>
+</div>

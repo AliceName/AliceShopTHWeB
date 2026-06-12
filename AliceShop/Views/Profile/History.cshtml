@@ -1,0 +1,183 @@
+@model IEnumerable<AliceShop.Models.Order>
+@{
+    ViewData["Title"] = "Lịch sử mua hàng | AliceStore";
+}
+
+<main class="flex-grow pt-12 pb-20 px-6 md:px-12 max-w-6xl mx-auto w-full animate-fadeIn font-sans">
+    <div class="flex flex-col md:flex-row gap-12 items-start">
+
+        <aside class="w-full md:w-60 flex-shrink-0 bg-white border border-outline-variant/20 rounded-xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.01)]">
+            <div class="mb-8">
+                <h1 class="font-serif text-2xl text-on-surface mb-1 font-medium tracking-wide">Tài khoản</h1>
+                <p class="text-on-surface-variant font-sans text-xs italic font-medium truncate">Chào mừng, @(User.Identity?.Name)</p>
+            </div>
+            <nav class="flex flex-col space-y-3">
+                <a class="flex items-center space-x-3 py-2.5 px-3 rounded-lg transition-all duration-300 text-on-surface-variant hover:text-primary hover:bg-surface-container-low/50 no-underline font-semibold text-sm" asp-area="Identity" asp-page="/Account/Manage/Index">
+                    <span class="material-symbols-outlined text-xl">person</span>
+                    <span class="font-sans">Thông tin cá nhân</span>
+                </a>
+                <a class="flex items-center space-x-3 py-2.5 px-3 rounded-lg transition-all duration-300 text-on-surface-variant hover:text-primary hover:bg-surface-container-low/50 no-underline font-semibold text-sm" asp-area="Identity" asp-page="/Account/Manage/ChangePassword">
+                    <span class="material-symbols-outlined text-xl">security</span>
+                    <span class="font-sans">Đổi mật khẩu</span>
+                </a>
+
+                <a class="flex items-center space-x-3 py-2.5 px-3 rounded-lg transition-all duration-300 bg-surface-container-low text-primary no-underline font-semibold text-sm" asp-area="" asp-controller="Profile" asp-action="Orders">
+                    <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+                    <span class="font-sans">Lịch sử đơn hàng</span>
+                </a>
+
+                <a class="flex items-center space-x-3 py-2.5 px-3 rounded-lg transition-all duration-300 text-on-surface-variant hover:text-primary hover:bg-surface-container-low/50 no-underline font-semibold text-sm" asp-area="" asp-controller="Profile" asp-action="Index">
+                    <span class="material-symbols-outlined text-xl">location_on</span>
+                    <span class="font-sans">Sổ địa chỉ</span>
+                </a>
+
+                <div class="pt-4 border-t border-outline-variant/30 mt-2">
+                    <form class="form-inline inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+                        <button type="submit" class="w-full flex items-center space-x-3 py-2.5 px-3 text-left text-error hover:bg-red-50/50 rounded-lg transition-all bg-transparent border-none cursor-pointer outline-none font-semibold text-sm">
+                            <span class="material-symbols-outlined text-xl">logout</span>
+                            <span class="font-sans">Đăng xuất</span>
+                        </button>
+                    </form>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="flex-grow w-full overflow-hidden">
+            <div class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-gradient-to-br from-[#c5a059] to-[#ebd09b] rounded-2xl p-6 text-white shadow-md relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-6 opacity-10">
+                        <span class="material-symbols-outlined text-[120px]">workspace_premium</span>
+                    </div>
+                    <p class="text-[10px] uppercase tracking-widest font-bold opacity-80 m-0">Hạng thành viên</p>
+                    <h3 class="text-xl font-bold uppercase tracking-wide mt-1 mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined">stars</span> Thành viên Vàng
+                    </h3>
+                    <p class="text-xs opacity-90 m-0">Ưu đãi giảm 5% cho mọi tác phẩm trang sức</p>
+                </div>
+
+                <div class="bg-white border border-outline-variant/30 rounded-2xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex flex-col justify-between">
+                    <div>
+                        <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold m-0">Điểm tích lũy hiện tại</p>
+                        <h3 class="text-2xl font-bold text-primary mt-1 m-0">1,250 <span class="text-xs font-medium text-on-surface-variant">Xu</span></h3>
+                    </div>
+                    <p class="text-[11px] text-emerald-600 font-medium m-0 flex items-center gap-1 mt-2">
+                        <span class="material-symbols-outlined text-sm">redeem</span> Đủ điều kiện đổi mã giảm giá 50k
+                    </p>
+                </div>
+
+                <div class="bg-white border border-outline-variant/30 rounded-2xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex flex-col justify-between">
+                    <div>
+                        <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold m-0">Tổng giá trị mua sắm</p>
+                        <h3 class="text-2xl font-bold text-on-surface mt-1 m-0">18,450,000 ₫</h3>
+                    </div>
+                    <p class="text-[11px] text-on-surface-variant m-0 mt-2">Tính từ đầu năm 2026</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-outline-variant/30 shadow-[0_4px_20px_rgba(0,0,0,0.02)] overflow-hidden">
+                <div class="p-5 border-b border-outline-variant/30">
+                    <h3 class="text-base font-bold text-on-surface m-0 uppercase tracking-wider flex items-center gap-2">
+                        <span class="material-symbols-outlined">history</span> Lịch sử đơn hàng
+                    </h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
+                        <thead>
+                            <tr class="bg-surface-container-low border-b border-outline-variant/30 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+                                <th class="px-4 py-4">Mã đơn</th>
+                                <th class="px-4 py-4">Ngày đặt</th>
+                                <th class="px-4 py-4">Tổng tiền</th>
+                                <th class="px-4 py-4 text-center">Tiến độ đơn</th>
+                                <th class="px-4 py-4 text-center">Thanh toán</th>
+                                <th class="px-4 py-4 text-right">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-outline-variant/10 text-sm font-medium text-on-surface">
+                            @foreach (var order in Model)
+                            {
+                                <tr class="hover:bg-primary/5 transition-colors align-middle">
+                                    <td class="px-4 py-4 font-bold text-primary">#@order.Id.ToString("D5")</td>
+                                    <td class="px-4 py-4 text-xs text-on-surface-variant">@order.OrderDate.ToString("dd/MM/yyyy")</td>
+                                    <td class="px-4 py-4 font-bold">@string.Format("{0:N0} ₫", order.TotalAmount)</td>
+                                    <td class="px-4 py-4 text-center">
+                                        @{
+                                            string statusBg = "bg-amber-50 text-amber-700 border border-amber-200/50";
+                                            string statusText = "Chờ xử lý";
+
+                                            switch (order.Status)
+                                            {
+                                                case "Pending":
+                                                    statusBg = "bg-amber-50 text-amber-700 border border-amber-200/50";
+                                                    statusText = "Chờ duyệt";
+                                                    break;
+                                                case "Processing":
+                                                    statusBg = "bg-blue-50 text-blue-700 border border-blue-200/50";
+                                                    statusText = "Chế tác";
+                                                    break;
+                                                case "Shipping":
+                                                    statusBg = "bg-indigo-50 text-indigo-700 border border-indigo-200/50";
+                                                    statusText = "Đang giao";
+                                                    break;
+                                                case "Completed":
+                                                    statusBg = "bg-emerald-50 text-emerald-700 border border-emerald-200/50";
+                                                    statusText = "Đã giao";
+                                                    break;
+                                                case "Cancelled":
+                                                    statusBg = "bg-red-50 text-red-600 border border-red-200/50";
+                                                    statusText = "Đã hủy";
+                                                    break;
+                                            }
+                                        }
+                                        <span class="inline-flex px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider @statusBg">
+                                            @statusText
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-4 text-center">
+                                        @if (order.PaymentStatus == "Paid")
+                                        {
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-100/60 text-emerald-800 rounded-full text-[10px] font-bold tracking-wider">
+                                                <span class="w-1 h-1 rounded-full bg-emerald-600"></span> ĐÃ TRẢ
+                                            </span>
+                                        }
+                                        else if (order.PaymentStatus == "Refunded")
+                                        {
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-amber-50 text-amber-700 rounded-full text-[10px] font-bold tracking-wider">
+                                                <span class="w-1 h-1 rounded-full bg-amber-500"></span> HOÀN TIỀN
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-red-50 text-red-700 rounded-full text-[10px] font-bold tracking-wider">
+                                                <span class="w-1 h-1 rounded-full bg-red-500"></span> CHƯA TRẢ
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="px-4 py-4 text-right flex justify-end gap-2">
+                                        <a asp-area="" asp-controller="Profile" asp-action="CustomerDetails" asp-route-id="@order.Id"
+                                           class="inline-flex items-center gap-1 px-3 py-1.5 border border-outline rounded-md text-xs font-bold uppercase tracking-wider text-on-surface hover:text-primary hover:border-primary no-underline bg-white cursor-pointer transition-all">
+                                            Chi tiết
+                                        </a>
+                                        <form asp-area="" asp-controller="ShoppingCart" asp-action="ReOrder" method="post" class="m-0">
+                                            <input type="hidden" name="orderId" value="@order.Id" />
+                                            <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary border-none text-white rounded-md text-xs font-bold uppercase tracking-wider hover:opacity-90 cursor-pointer transition-all">
+                                                Đặt lại
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @if (!Model.Any())
+                {
+                    <div class="px-6 py-16 text-center bg-[#faf9f7]/40">
+                        <span class="material-symbols-outlined text-4xl text-outline-variant mb-2">inventory_2</span>
+                        <p class="text-sm font-semibold text-on-surface-variant m-0">Bạn chưa thực hiện giao dịch mua sắm nào tại AliceStore.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+</main>

@@ -120,7 +120,7 @@ namespace AliceShop.Areas.Admin.Controllers
             ViewBag.ChartLabels = labels;
             ViewBag.ChartData = data;
 
-            // 4. Lấy chi tiết đơn hàng hoàn thành để phân tích sâu
+            // 4. Lấy chi tiết đơn hàng hoàn thành để phân tích 
             var orderDetailsWithinRange = await _context.OrderDetails
                 .Include(od => od.Order)
                 .Include(od => od.ProductSizeVariant)

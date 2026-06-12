@@ -3,6 +3,7 @@ using AliceShop.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AliceShop.Controllers
 {
@@ -45,6 +46,20 @@ namespace AliceShop.Controllers
             if (product == null) return NotFound();
 
             ViewBag.CategoriesList = await _categoryRepository.GetAllAsync();
+
+            // ── LOGIC BÁN CHÉO (CROSS-SELLING) ───────────────────
+            // 1. Lấy toàn bộ danh sách sản phẩm từ Repository
+            var allProducts = await _productRepository.GetAllAsync();
+
+            // 2. Lọc danh sách: Chọn các sản phẩm có cùng CategoryId nhưng loại bỏ sản phẩm hiện tại (id)
+            var relatedProductsList = allProducts
+                .Where(p => p.CategoryId == product.CategoryId && p.Id != product.Id)
+                .Take(4) // Giới hạn lấy đúng 4 tuyệt tác để hiển thị vừa vặn trên 1 dòng Grid của giao diện
+                .ToList();
+
+            // 3. Đóng gói danh sách gửi sang tệp tin Views/Product/Details.cshtml
+            ViewBag.RelatedProducts = relatedProductsList;
+            // ──────────────────────────────────────────────────────────────────────────────
 
             return View(product);
         }

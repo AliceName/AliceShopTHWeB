@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AliceShop.Extensions; // Kích hoạt Extension để nhận diện SetObjectAsJson / GetObjectFromJson
@@ -28,10 +30,8 @@ namespace AliceShop.Controllers
         // ── 1. INDEX: GIAO DIỆN GIỎ HÀNG KHÁCH HÀNG ───────────────────────────────────
         public async Task<IActionResult> Index()
         {
-            // 🔥 ĐỒNG BỘ: Sửa thành GetObjectFromJson theo file Extension của Ngà
             var cart = HttpContext.Session.GetObjectFromJson<ShoppingCart>(CART_SESSION_KEY) ?? new ShoppingCart();
 
-            // Nạp lại thông tin Product và SizeName từ SQL Server để tránh lỗi Null ngoài giao diện
             if (cart.Items.Any())
             {
                 foreach (var item in cart.Items)
@@ -82,12 +82,8 @@ namespace AliceShop.Controllers
                 Quantity = quantity
             };
 
-            // 🔥 ĐỒNG BỘ: Sửa thành GetObjectFromJson theo file Extension của Ngà
             var cart = HttpContext.Session.GetObjectFromJson<ShoppingCart>(CART_SESSION_KEY) ?? new ShoppingCart();
-
             cart.AddItem(cartItem);
-
-            // 🔥 ĐỒNG BỘ: Sửa thành SetObjectAsJson theo file Extension của Ngà
             HttpContext.Session.SetObjectAsJson(CART_SESSION_KEY, cart);
 
             var successMsg = $"Đã thêm {variant.Product.Name} ({variant.ProductSize.SizeName}) vào túi hàng.";
@@ -138,14 +134,11 @@ namespace AliceShop.Controllers
         // ── 3. REMOVE FROM CART: XÓA MÓN DỰA THEO MÃ BIẾN THỂ KÍCH CỠ ──────────────────
         public IActionResult RemoveFromCart(int sizeVariantId)
         {
-            // 🔥 ĐỒNG BỘ: Sửa thành GetObjectFromJson theo file Extension của Ngà
             var cart = HttpContext.Session.GetObjectFromJson<ShoppingCart>(CART_SESSION_KEY);
 
             if (cart is not null)
             {
                 cart.RemoveItem(sizeVariantId);
-
-                // 🔥 ĐỒNG BỘ: Sửa thành SetObjectAsJson theo file Extension của Ngà
                 HttpContext.Session.SetObjectAsJson(CART_SESSION_KEY, cart);
             }
 
@@ -156,7 +149,6 @@ namespace AliceShop.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateQuantity(int sizeVariantId, int quantity)
         {
-            // 🔥 ĐỒNG BỘ: Sửa thành GetObjectFromJson theo file Extension của Ngà
             var cart = HttpContext.Session.GetObjectFromJson<ShoppingCart>(CART_SESSION_KEY);
 
             if (cart is not null && quantity > 0)
@@ -165,8 +157,6 @@ namespace AliceShop.Controllers
                 if (variant != null && variant.StockQuantity >= quantity)
                 {
                     cart.UpdateQuantity(sizeVariantId, quantity);
-
-                    // 🔥 ĐỒNG BỘ: Sửa thành SetObjectAsJson theo file Extension của Ngà
                     HttpContext.Session.SetObjectAsJson(CART_SESSION_KEY, cart);
                 }
             }
@@ -185,7 +175,6 @@ namespace AliceShop.Controllers
                 return RedirectToAction("Index");
             }
 
-            // Đồng bộ dữ liệu để tính toán tổng tiền hiển thị chính xác
             foreach (var item in cart.Items)
             {
                 var variant = await _context.ProductSizeVariants
@@ -194,10 +183,8 @@ namespace AliceShop.Controllers
                 if (variant != null) item.ProductSizeVariant = variant;
             }
 
-            // Truyền tổng tiền sang để hiển thị tóm tắt hóa đơn
             ViewBag.Cart = cart;
 
-            // Tự động bốc Email hoặc thông tin mặc định của User đã đăng nhập (Nếu có) làm tiền đề cho sổ địa chỉ sau này
             var user = await _userManager.GetUserAsync(User);
             var orderInit = new Order
             {
@@ -210,7 +197,7 @@ namespace AliceShop.Controllers
                     .Where(a => a.UserId == user.Id)
                     .OrderByDescending(a => a.IsDefault)
                     .ToListAsync();
-                
+
                 ViewBag.Addresses = addresses;
 
                 var defaultAddress = addresses.FirstOrDefault(a => a.IsDefault) ?? addresses.FirstOrDefault();
@@ -222,7 +209,7 @@ namespace AliceShop.Controllers
                 }
             }
 
-            return View(orderInit); // Nạp file Views/ShoppingCart/Checkout.cshtml
+            return View(orderInit);
         }
 
         // ── 6. CHECKOUT (POST): XỬ LÝ LƯU HÓA ĐƠN ĐƠN HÀNG VÀ TRỪ KHO THỰC TẾ ─────────
@@ -238,7 +225,6 @@ namespace AliceShop.Controllers
                 return RedirectToAction("Index");
             }
 
-            // Nạp lại dữ liệu biến thể để chốt giá đóng băng lịch sử và kiểm tra kho lần cuối
             foreach (var item in cart.Items)
             {
                 var variant = await _context.ProductSizeVariants
@@ -257,22 +243,32 @@ namespace AliceShop.Controllers
 
             if (ModelState.IsValid)
             {
-                // 1. Gán các thông tin hệ thống cho đơn hàng
                 var user = await _userManager.GetUserAsync(User);
                 order.UserId = user?.Id;
                 order.OrderDate = DateTime.Now;
-                order.Status = "Pending"; // Đặt trạng thái chờ duyệt ban đầu
-                order.TotalAmount = cart.TotalAmount; // Ghi nhận số tiền chốt từ thuộc tính TotalAmount của ShoppingCart
+                order.TotalAmount = cart.TotalAmount;
 
-                // 2. Chuyển đổi toàn bộ item trong giỏ hàng sang bảng chi tiết hóa đơn OrderDetails
+                // 🔥 ĐỒNG BỘ KIẾN TRÚC: Tất cả đơn hàng mới tạo đều ở tiến độ "Chờ phê duyệt"
+                order.Status = "Pending";
+
+                // Thiết lập trạng thái dòng tiền dựa theo phương thức thanh toán khách chọn
+                if (order.PaymentMethod == "COD" || order.PaymentMethod == "BankTransfer")
+                {
+                    order.PaymentStatus = "Unpaid"; // Tiền mặt hoặc quét mã VietQR thủ công đều là chưa thu tiền
+                }
+                else
+                {
+                    order.PaymentStatus = "Unpaid"; // Thanh toán online cũng đặt tạm Unpaid, khi đối tác duyệt mới đổi sang Paid
+                }
+
                 order.OrderDetails = cart.Items.Select(item => new OrderDetail
                 {
-                    ProductSizeVariantId = item.ProductSizeVariantId, // Khóa ngoại bám chuẩn biến thể kích cỡ
+                    ProductSizeVariantId = item.ProductSizeVariantId,
                     Quantity = item.Quantity,
-                    Price = item.ProductSizeVariant.Price // Đóng băng giá gốc lịch sử bán
+                    Price = item.ProductSizeVariant.Price
                 }).ToList();
 
-                // 3. ⚠️ QUAN TRỌNG: Vòng lặp trừ kho thực tế dưới SQL Server để tránh lỗi bán lố (Overselling)
+                // Kiểm tra và thực hiện trừ kho thực tế dưới SQL Server
                 foreach (var item in cart.Items)
                 {
                     var dbVariant = await _context.ProductSizeVariants.FindAsync(item.ProductSizeVariantId);
@@ -283,25 +279,102 @@ namespace AliceShop.Controllers
                             TempData["ErrorMessage"] = $"Tác phẩm {item.ProductSizeVariant.Product.Name} ({item.ProductSizeVariant.ProductSize.SizeName}) vừa hết hàng hoặc không đủ số lượng trong kho.";
                             return RedirectToAction("Index");
                         }
-                        // Tiến hành khấu trừ số lượng kho thực tế của riêng Size này
                         dbVariant.StockQuantity -= item.Quantity;
                     }
                 }
 
-                // 4. Lưu toàn cục hóa đơn đơn hàng xuống Database SQL Server
                 _context.Orders.Add(order);
                 await _context.SaveChangesAsync();
 
-                // 5. Xóa sạch giỏ hàng tạm thời trong Session sau khi đặt mua thành công
-                HttpContext.Session.Remove(CART_SESSION_KEY);
+                // ── 🔥 RẼ NHÁNH ĐIỀU HƯỚNG ───────────────────────────────────────────
+                if (order.PaymentMethod == "CreditCard" || order.PaymentMethod == "EWallet")
+                {
+                    // Chuyển hướng sang trạm trung gian quẹt thẻ / ví để thu tiền trước, giỏ hàng giữ nguyên
+                    return RedirectToAction("ProcessOnlinePayment", new { orderId = order.Id, method = order.PaymentMethod });
+                }
 
-                // Trả về View thông báo đặt hàng thành công và gửi kèm mã đơn hàng tự tăng
+                // Nếu là BankTransfer hoặc COD -> Xóa sạch túi hàng Session vì đơn chờ đã được ghi nhận an toàn
+                HttpContext.Session.Remove(CART_SESSION_KEY);
                 return View("OrderCompleted", order.Id);
             }
 
-            // Nếu dữ liệu form nhập địa chỉ bị lỗi, render lại trang Checkout kèm dữ liệu giỏ hàng để hiển thị
             ViewBag.Cart = cart;
             return View(order);
+        }
+
+        // ── 7. XỬ LÝ TRẠM ENDPOINT: CHỈ KHI THANH TOÁN XONG MỚI BÁO THÀNH CÔNG VÀ XÓA GIỎ HÀNG ──
+        [Authorize]
+        public async Task<IActionResult> ProcessOnlinePayment(int orderId, string method)
+        {
+            var order = await _context.Orders.FindAsync(orderId);
+            if (order == null) return NotFound();
+
+            // Giả lập cổng thanh toán trực tuyến trả về kết quả thành công thành công (SUCCESS)
+            bool isPaymentSuccess = true;
+
+            if (isPaymentSuccess)
+            {
+                //  Khớp lệnh thành công -> Chuyển cột tiền sang Paid. 
+                // Cột tiến độ Status giữ nguyên là "Pending" (Chờ Admin bọc hộp Premium mang giao).
+                order.PaymentStatus = "Paid";
+                _context.Orders.Update(order);
+                await _context.SaveChangesAsync();
+
+                // Dọn sạch túi hàng Session của khách sau khi đã tất toán hóa đơn an toàn
+                HttpContext.Session.Remove(CART_SESSION_KEY);
+
+                ViewBag.PaymentMethodUsed = method == "CreditCard" ? "Thẻ quốc tế Visa/Mastercard" : "Ví điện tử thông minh";
+                return View("OrderCompleted", orderId);
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Giao dịch thanh toán trực tuyến không thành công. Vui lòng thử lại.";
+                return RedirectToAction("Index");
+            }
+        }
+
+        // ── 8. RE-ORDER: TÍNH NĂNG ĐẶT LẠI ĐƠN HÀNG CŨ CHO KHÁCH HÀNG ───────────────────
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ReOrder(int orderId)
+        {
+            var oldOrder = await _context.Orders
+                .Include(o => o.OrderDetails)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (oldOrder == null) return NotFound("Không tìm thấy dữ liệu đơn hàng cũ.");
+
+            // Lấy giỏ hàng hiện tại trong Session ra hoặc sinh mới nếu chưa có
+            var cart = HttpContext.Session.GetObjectFromJson<ShoppingCart>(CART_SESSION_KEY) ?? new ShoppingCart();
+
+            foreach (var detail in oldOrder.OrderDetails)
+            {
+                var variant = await _context.ProductSizeVariants
+                    .Include(pv => pv.Product)
+                    .Include(pv => pv.ProductSize)
+                    .FirstOrDefaultAsync(pv => pv.Id == detail.ProductSizeVariantId);
+
+                if (variant != null && variant.StockQuantity > 0)
+                {
+                    // Tính toán số lượng tối đa có thể mua dựa vào kho thực tế còn lại
+                    int purchaseQuantity = Math.Min(detail.Quantity, variant.StockQuantity);
+
+                    var cartItem = new CartItem
+                    {
+                        ProductSizeVariantId = detail.ProductSizeVariantId,
+                        ProductSizeVariant = variant,
+                        Quantity = purchaseQuantity
+                    };
+
+                    cart.AddItem(cartItem);
+                }
+            }
+
+            // Lưu lại tổ hợp túi hàng mới vào Session
+            HttpContext.Session.SetObjectAsJson(CART_SESSION_KEY, cart);
+
+            TempData["SuccessMessage"] = "Đã tự động tái nạp toàn bộ tuyệt tác từ đơn hàng cũ vào túi hàng hiện hành của bạn!";
+            return RedirectToAction("Index");
         }
     }
 }

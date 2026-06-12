@@ -4,154 +4,187 @@
     ViewData["Title"] = $"Chi tiết đơn hàng #{Model.Id.ToString("D5")}";
 }
 
-<div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+<div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 font-sans">
     <div>
-        <h2 class="font-headline-md text-2xl font-bold text-on-surface m-0 flex items-center gap-3">
+        <h2 class="font-sans text-2xl font-bold text-on-surface m-0 flex items-center gap-3 uppercase tracking-wide">
             Đơn hàng #@Model.Id.ToString("D5")
             @{
-                string badgeBg = "bg-surface-variant/50";
-                string badgeText = "text-on-surface";
+                string badgeBg = "bg-surface-variant/50 border border-outline-variant/30 text-on-surface";
                 string statusText = Model.Status;
 
-                switch (Model.Status?.ToLower())
+                switch (Model.Status)
                 {
-                    case "pending": badgeBg = "bg-[#c5a059]/10"; badgeText = "text-[#4e3700]"; statusText = "Chờ xử lý"; break;
-                    case "processing": badgeBg = "bg-[#c5a059]/20"; badgeText = "text-[#4e3700]"; statusText = "Đang xử lý"; break;
-                    case "shipped": badgeBg = "bg-[#a5a6a2]/20"; badgeText = "text-[#3a3c39]"; statusText = "Đang giao"; break;
-                    case "completed": badgeBg = "bg-[#e4e2e1]/40"; badgeText = "text-[#474747]"; statusText = "Đã hoàn thành"; break;
-                    case "cancelled": badgeBg = "bg-[#ffdad6]"; badgeText = "text-[#93000a]"; statusText = "Đã hủy"; break;
+                    case "Pending": badgeBg = "bg-amber-50 border border-amber-200 text-amber-700"; statusText = "Chờ duyệt"; break;
+                    case "Processing": badgeBg = "bg-blue-50 border border-blue-200 text-blue-700"; statusText = "Chế tác"; break;
+                    case "Shipping": badgeBg = "bg-indigo-50 border border-indigo-200 text-indigo-700"; statusText = "Đang giao"; break;
+                    case "Completed": badgeBg = "bg-emerald-50 border border-emerald-200 text-emerald-700"; statusText = "Thành công"; break;
+                    case "Cancelled": badgeBg = "bg-red-50 border border-red-200 text-red-600"; statusText = "Đã hủy"; break;
                 }
             }
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider @badgeBg @badgeText">
+            <span class="inline-flex items-center px-3 py-0.5 rounded text-xs font-bold uppercase tracking-wider @badgeBg">
                 @statusText
             </span>
         </h2>
     </div>
-    <a asp-action="Index" class="inline-flex items-center gap-2 px-4 py-2 border border-outline-variant rounded-md font-label-md text-xs font-bold uppercase tracking-wider text-on-surface hover:bg-surface-container transition-colors no-underline">
-        <span class="material-symbols-outlined text-[18px]">arrow_back</span> 
+    <a asp-action="Index" class="inline-flex items-center gap-2 px-4 py-2 border border-outline-variant rounded-md font-sans text-xs font-bold uppercase tracking-wider text-on-surface hover:bg-surface-container transition-colors no-underline bg-white">
+        <span class="material-symbols-outlined text-[18px]">arrow_back</span>
         Quay lại
     </a>
 </div>
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="mb-8 p-4 bg-[#c5a059]/10 border border-[#c5a059]/30 rounded-lg flex items-center gap-3 animate-fadeIn">
-        <span class="material-symbols-outlined text-primary">check_circle</span>
-        <span class="font-body-md text-sm font-medium text-on-surface">@TempData["SuccessMessage"]</span>
+    <div class="mb-8 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg flex items-center gap-3 animate-fadeIn font-sans text-sm font-medium">
+        <span class="material-symbols-outlined text-emerald-600">check_circle</span>
+        <span>@TempData["SuccessMessage"]</span>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="mb-8 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg flex items-center gap-3 animate-fadeIn font-sans text-sm font-medium">
+        <span class="material-symbols-outlined text-red-600">gpp_maybe</span>
+        <span>@TempData["ErrorMessage"]</span>
     </div>
 }
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <!-- Cột Thông tin khách hàng & Giao hàng -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 font-sans">
+
     <div class="lg:col-span-1 space-y-8">
-        <div class="bg-white rounded-xl border border-outline-variant/30 shadow-[0_4px_20px_rgba(0,0,0,0.02)] p-6">
-            <h6 class="font-headline-md text-lg font-bold text-primary mb-6 flex items-center gap-2 m-0">
+        <div class="bg-white rounded-xl border border-outline-variant/30 shadow-[0_4px_20px_rgba(0,0,0,0.02)] p-6 space-y-5">
+            <h6 class="text-base font-bold text-primary flex items-center gap-2 m-0 uppercase tracking-wider">
                 <span class="material-symbols-outlined">local_shipping</span>
                 Thông tin Giao hàng
             </h6>
-            
-            <div class="space-y-5">
+
+            <div class="space-y-4 text-xs font-medium">
                 <div>
-                    <p class="font-label-md text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-1 m-0">Khách hàng</p>
-                    <p class="font-body-md text-sm font-semibold text-on-surface m-0">@Model.FullName</p>
+                    <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-1 m-0">Khách hàng</p>
+                    <p class="text-sm font-semibold text-on-surface m-0">@Model.FullName</p>
                 </div>
                 <div>
-                    <p class="font-label-md text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-1 m-0">Số điện thoại</p>
-                    <p class="font-body-md text-sm font-semibold text-on-surface m-0">@Model.PhoneNumber</p>
+                    <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-1 m-0">Số điện thoại</p>
+                    <p class="text-sm font-semibold text-on-surface m-0">@Model.PhoneNumber</p>
                 </div>
                 <div>
-                    <p class="font-label-md text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-1 m-0">Địa chỉ nhận hàng</p>
-                    <p class="font-body-md text-sm font-semibold text-on-surface m-0 leading-relaxed">@Model.ShippingAddress</p>
+                    <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-1 m-0">Địa chỉ nhận hàng</p>
+                    <p class="text-sm font-semibold text-on-surface m-0 leading-relaxed text-justify">@Model.ShippingAddress</p>
                 </div>
                 <div>
-                    <p class="font-label-md text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-1 m-0">Ngày đặt hàng</p>
-                    <p class="font-body-md text-sm font-semibold text-on-surface m-0">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                    <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-1 m-0">Phương thức thanh toán gốc</p>
+                    <p class="text-sm font-bold text-primary m-0 uppercase">
+                        @(Model.PaymentMethod == "BankTransfer" ? "Chuyển khoản VietQR" : Model.PaymentMethod == "COD" ? "Thu hộ tiền mặt (COD)" : "Trực tuyến thành công")
+                    </p>
                 </div>
                 <div>
-                    <p class="font-label-md text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-1 m-0">Ghi chú của khách</p>
+                    <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-1 m-0">Ngày đặt hàng</p>
+                    <p class="text-sm font-semibold text-on-surface m-0">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                </div>
+                <div>
+                    <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-1 m-0">Ghi chú của khách</p>
                     @if (!string.IsNullOrEmpty(Model.OrderNote))
                     {
-                        <p class="font-body-md text-sm font-semibold text-amber-700 bg-amber-50 p-2.5 rounded border border-amber-200/50 italic m-0 leading-relaxed">@Model.OrderNote</p>
+                        <p class="text-xs font-semibold text-amber-700 bg-amber-50 p-2.5 rounded border border-amber-200/50 italic m-0 mt-1 leading-relaxed">@Model.OrderNote</p>
                     }
                     else
                     {
-                        <p class="font-body-md text-sm text-on-surface-variant italic m-0">Không có ghi chú</p>
+                        <p class="text-xs text-on-surface-variant italic m-0 mt-1">Không có ghi chú</p>
                     }
                 </div>
             </div>
-            
-            <hr class="border-outline-variant/30 my-6">
-            
-            <form asp-action="UpdateStatus" method="post" class="flex flex-col gap-4 m-0">
+
+            <hr class="border-outline-variant/30 my-4">
+
+            <form asp-action="UpdateOrderStatus" method="post" class="flex flex-col gap-3 m-0">
                 <input type="hidden" name="id" value="@Model.Id" />
-                <div class="flex flex-col gap-2">
-                    <label class="font-label-md text-[10px] text-on-surface-variant uppercase tracking-widest font-bold m-0">Trạng thái đơn hàng</label>
-                    <select name="status" class="w-full bg-surface-container-low border border-outline-variant/50 text-on-surface text-sm rounded-md px-3 py-2.5 focus:border-primary focus:ring-0 outline-none">
-                        <option value="Pending" selected="@(Model.Status == "Pending")">Chờ xử lý</option>
-                        <option value="Processing" selected="@(Model.Status == "Processing")">Đang xử lý</option>
-                        <option value="Shipped" selected="@(Model.Status == "Shipped")">Đang giao</option>
-                        <option value="Completed" selected="@(Model.Status == "Completed")">Đã hoàn thành</option>
-                        <option value="Cancelled" selected="@(Model.Status == "Cancelled")">Đã hủy</option>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold m-0">1. Trạng thái xử lý hàng hóa</label>
+                    <select name="status" class="w-full bg-surface-container-low border border-outline-variant/50 text-on-surface text-xs font-bold rounded-lg px-3 py-2.5 focus:border-primary focus:ring-0 outline-none cursor-pointer">
+                        <option value="Pending" selected="@(Model.Status == "Pending")">Chờ duyệt đơn</option>
+                        <option value="Processing" selected="@(Model.Status == "Processing")">Đang chế tác/Đóng gói</option>
+                        <option value="Shipping" selected="@(Model.Status == "Shipping")">Đang vận chuyển Premium</option>
+                        <option value="Completed" selected="@(Model.Status == "Completed")">Giao thành công</option>
+                        <option value="Cancelled" selected="@(Model.Status == "Cancelled")">Đã hủy vận đơn</option>
                     </select>
                 </div>
-                <button type="submit" class="w-full bg-primary text-white font-label-md text-xs font-bold uppercase tracking-wider py-3 rounded-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2 border-none cursor-pointer">
-                    <span class="material-symbols-outlined text-[18px]">save</span>
-                    Cập nhật
+                <button type="submit" class="w-full bg-primary text-white text-xs font-bold uppercase tracking-wider py-2.5 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2 border-none cursor-pointer" @(Model.Status == "Completed" || Model.Status == "Cancelled" ? "disabled style='opacity:0.4; cursor:not-allowed;'" : "")>
+                    <span class="material-symbols-outlined text-[18px]">save</span> Cập nhật tiến độ hàng
+                </button>
+            </form>
+
+            <form asp-action="UpdatePaymentStatus" method="post" class="flex flex-col gap-3 m-0 pt-2">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold m-0">2. Trạng thái dòng tiền (Thanh toán)</label>
+                    <select name="paymentStatus" class="w-full bg-surface-container-low border border-outline-variant/50 text-on-surface text-xs font-bold rounded-lg px-3 py-2.5 focus:border-primary focus:ring-0 outline-none cursor-pointer">
+                        <option value="Unpaid" selected="@(Model.PaymentStatus == "Unpaid")">Chưa thanh toán</option>
+                        <option value="Paid" selected="@(Model.PaymentStatus == "Paid")">Đã nhận tiền (Paid)</option>
+                        <option value="Refunded" selected="@(Model.PaymentStatus == "Refunded")">Đã hoàn tiền (Refunded)</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-white border border-primary text-primary text-xs font-bold uppercase tracking-wider py-2.5 rounded-lg hover:bg-primary hover:text-white transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    <span class="material-symbols-outlined text-[18px]">payments</span> Xác nhận dòng tiền
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Cột Chi tiết sản phẩm -->
     <div class="lg:col-span-2">
-        <div class="bg-white rounded-xl border border-outline-variant/30 shadow-[0_4px_20px_rgba(0,0,0,0.02)] overflow-hidden h-full">
-            <div class="p-6 border-b border-outline-variant/30 bg-surface-bright">
-                <h6 class="font-headline-md text-lg font-bold text-primary flex items-center gap-2 m-0">
-                    <span class="material-symbols-outlined">inventory_2</span>
-                    Sản phẩm đã đặt
-                </h6>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[600px]">
-                    <thead>
-                        <tr class="bg-surface-container-low border-b border-outline-variant/30">
-                            <th class="px-6 py-4 font-label-md text-xs text-on-surface-variant uppercase tracking-wider font-bold">Sản phẩm</th>
-                            <th class="px-6 py-4 font-label-md text-xs text-on-surface-variant uppercase tracking-wider font-bold text-center">Size</th>
-                            <th class="px-6 py-4 font-label-md text-xs text-on-surface-variant uppercase tracking-wider font-bold text-right">Đơn giá</th>
-                            <th class="px-6 py-4 font-label-md text-xs text-on-surface-variant uppercase tracking-wider font-bold text-center">Số lượng</th>
-                            <th class="px-6 py-4 font-label-md text-xs text-on-surface-variant uppercase tracking-wider font-bold text-right">Thành tiền</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-outline-variant/10">
-                        @foreach (var detail in Model.OrderDetails)
-                        {
-                            var productImg = detail.ProductSizeVariant?.Product?.ImageUrl ?? "/images/placeholder.png";
-                            var productName = detail.ProductSizeVariant?.Product?.Name ?? "N/A";
-                            var sizeName = detail.ProductSizeVariant?.ProductSize?.SizeName ?? "N/A";
-                            var lineTotal = detail.Price * detail.Quantity;
-                            
-                            <tr class="hover:bg-primary/5 transition-colors">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-4">
-                                        <img src="@productImg" alt="" class="w-12 h-12 object-cover rounded bg-surface-container-low border border-outline-variant/30">
-                                        <span class="font-body-md text-sm font-semibold text-on-surface">@productName</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 font-body-md text-sm text-center text-on-surface-variant">@sizeName</td>
-                                <td class="px-6 py-4 font-body-md text-sm text-right text-on-surface">@string.Format("{0:N0} ₫", detail.Price)</td>
-                                <td class="px-6 py-4 font-body-md text-sm text-center text-on-surface font-semibold">@detail.Quantity</td>
-                                <td class="px-6 py-4 font-body-md text-sm text-right font-bold text-primary">@string.Format("{0:N0} ₫", lineTotal)</td>
+        <div class="bg-white rounded-xl border border-outline-variant/30 shadow-[0_4px_20px_rgba(0,0,0,0.02)] overflow-hidden h-full flex flex-col justify-between">
+            <div>
+                <div class="p-6 border-b border-outline-variant/30 bg-surface-bright">
+                    <h6 class="text-base font-bold text-primary flex items-center gap-2 m-0 uppercase tracking-wider">
+                        <span class="material-symbols-outlined">inventory_2</span>
+                        Sản phẩm đã đặt
+                    </h6>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
+                        <thead>
+                            <tr class="bg-surface-container-low border-b border-outline-variant/30 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+                                <th class="px-6 py-4">Sản phẩm</th>
+                                <th class="px-6 py-4 text-center">Size</th>
+                                <th class="px-6 py-4 text-right">Đơn giá</th>
+                                <th class="px-6 py-4 text-center">Số lượng</th>
+                                <th class="px-6 py-4 text-right">Thành tiền</th>
                             </tr>
-                        }
-                    </tbody>
-                    <tfoot class="bg-surface-container-low border-t border-outline-variant/30">
-                        <tr>
-                            <td colspan="4" class="px-6 py-5 text-right font-label-md text-xs uppercase tracking-widest font-bold text-on-surface-variant">Tổng cộng:</td>
-                            <td class="px-6 py-5 text-right font-headline-md text-xl font-bold text-primary">@string.Format("{0:N0} ₫", Model.TotalAmount)</td>
-                        </tr>
-                    </tfoot>
-                </table>
+                        </thead>
+                        <tbody class="divide-y divide-outline-variant/10 text-sm font-medium text-on-surface">
+                            @foreach (var detail in Model.OrderDetails)
+                            {
+                                var productImg = detail.ProductSizeVariant?.Product?.ImageUrl ?? "/images/placeholder.png";
+                                var productName = detail.ProductSizeVariant?.Product?.Name ?? "N/A";
+                                var sizeName = detail.ProductSizeVariant?.ProductSize?.SizeName ?? "N/A";
+                                var lineTotal = detail.Price * detail.Quantity;
+
+                                <tr class="hover:bg-primary/5 transition-colors align-middle">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-4">
+                                            <img src="@productImg" alt="" class="w-12 h-12 object-cover rounded bg-surface-container-low border border-outline-variant/30 flex-shrink-0">
+                                            <span class="font-bold text-on-background line-clamp-1">@productName</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-center text-on-surface-variant text-xs">@sizeName</td>
+                                    <td class="px-6 py-4 text-right text-on-surface-variant">@string.Format("{0:N0} ₫", detail.Price)</td>
+                                    <td class="px-6 py-4 text-center font-bold">@detail.Quantity</td>
+                                    <td class="px-6 py-4 text-right font-bold text-primary">@string.Format("{0:N0} ₫", lineTotal)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-surface-container-low border-t border-outline-variant/30 p-6 flex justify-between items-center">
+                <span class="text-xs uppercase tracking-widest font-bold text-on-surface-variant">Tổng cộng hóa đơn:</span>
+                <div class="text-right space-y-1">
+                    <span class="text-2xl font-bold text-primary block">@string.Format("{0:N0} ₫", Model.TotalAmount)</span>
+                    <span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white border border-outline-variant/50 @(Model.PaymentStatus == "Paid" ? "text-emerald-700" : "text-red-600")">
+                        <span class="w-1 h-1 rounded-full @(Model.PaymentStatus == "Paid" ? "bg-emerald-600" : "bg-red-500")"></span>
+                        Tình trạng: @(Model.PaymentStatus == "Paid" ? "Đã tất toán" : "Chưa thu tiền")
+                    </span>
+                </div>
             </div>
         </div>
     </div>
+
 </div>

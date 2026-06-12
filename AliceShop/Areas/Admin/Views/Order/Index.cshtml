@@ -1,116 +1,151 @@
 @model IEnumerable<AliceShop.Models.Order>
 
 @{
-    ViewData["Title"] = "Quản lý đơn hàng";
+    ViewData["Title"] = "Quản lý đơn hàng | AliceStore";
 }
 
-<div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+<div class="mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 font-sans">
     <div>
-        <h2 class="font-headline-md text-2xl font-bold text-on-surface m-0">Quản lý Đơn hàng</h2>
-        <p class="font-label-md text-xs text-on-surface-variant uppercase tracking-widest mt-1 m-0">Theo dõi và cập nhật trạng thái các đơn hàng</p>
+        <h2 class="font-sans text-2xl font-bold text-on-surface m-0 uppercase tracking-wide">Quản lý Đơn hàng</h2>
+        <p class="font-sans text-xs text-on-surface-variant uppercase tracking-widest mt-1 m-0">Kiểm soát tiến độ xử lý tác phẩm và giám sát dòng tiền bảo mật</p>
     </div>
-    
-    <form method="get" class="flex items-center gap-3 bg-white border border-outline-variant/50 rounded-md px-3 py-2 shadow-sm">
-        <label class="font-label-md text-xs font-bold text-on-surface uppercase tracking-wider mb-0 flex items-center gap-2">
-            <span class="material-symbols-outlined text-base">filter_list</span>
-            Lọc:
-        </label>
-        <select name="status" class="bg-transparent border-none text-sm font-body-md text-on-surface p-0 focus:ring-0 cursor-pointer outline-none" onchange="this.form.submit()">
-            <option value="All" selected="@(ViewBag.CurrentStatus == "All")">Tất cả</option>
-            <option value="Pending" selected="@(ViewBag.CurrentStatus == "Pending")">Chờ xử lý</option>
-            <option value="Processing" selected="@(ViewBag.CurrentStatus == "Processing")">Đang xử lý</option>
-            <option value="Shipped" selected="@(ViewBag.CurrentStatus == "Shipped")">Đang giao</option>
-            <option value="Completed" selected="@(ViewBag.CurrentStatus == "Completed")">Đã hoàn thành</option>
-            <option value="Cancelled" selected="@(ViewBag.CurrentStatus == "Cancelled")">Đã hủy</option>
-        </select>
+
+    <form method="get" class="flex flex-col sm:flex-row items-center gap-4 bg-white border border-outline-variant/50 rounded-xl px-4 py-2.5 shadow-sm w-full lg:w-auto">
+
+        <div class="flex items-center gap-2 w-full sm:w-auto border-b sm:border-b-0 sm:border-r border-outline-variant/30 pb-2 sm:pb-0 pr-0 sm:pr-4">
+            <span class="material-symbols-outlined text-sm text-outline">local_shipping</span>
+            <span class="text-[11px] font-bold text-on-surface uppercase tracking-wider whitespace-nowrap">Tiến độ:</span>
+            <select name="status" class="bg-transparent border-none text-xs font-bold text-primary p-0 focus:ring-0 cursor-pointer outline-none" onchange="this.form.submit()">
+                <option value="All" selected="@(ViewBag.CurrentStatus == "All")">Tất cả hàng hóa</option>
+                <option value="Pending" selected="@(ViewBag.CurrentStatus == "Pending")">Chờ phê duyệt đơn</option>
+                <option value="Processing" selected="@(ViewBag.CurrentStatus == "Processing")">Đang chế tác/Đóng gói</option>
+                <option value="Shipping" selected="@(ViewBag.CurrentStatus == "Shipping")">Đang vận chuyển Premium</option>
+                <option value="Completed" selected="@(ViewBag.CurrentStatus == "Completed")">Giao thành công</option>
+                <option value="Cancelled" selected="@(ViewBag.CurrentStatus == "Cancelled")">Đã hủy vận đơn</option>
+            </select>
+        </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto pt-1 sm:pt-0">
+            <span class="material-symbols-outlined text-sm text-outline">payments</span>
+            <span class="text-[11px] font-bold text-on-surface uppercase tracking-wider whitespace-nowrap">Dòng tiền:</span>
+            <select name="paymentStatus" class="bg-transparent border-none text-xs font-bold text-primary p-0 focus:ring-0 cursor-pointer outline-none" onchange="this.form.submit()">
+                <option value="All" selected="@(ViewBag.CurrentPaymentStatus == "All")">Tất cả dòng tiền</option>
+                <option value="Unpaid" selected="@(ViewBag.CurrentPaymentStatus == "Unpaid")">Chưa thanh toán</option>
+                <option value="Paid" selected="@(ViewBag.CurrentPaymentStatus == "Paid")">Đã thanh toán (Paid)</option>
+                <option value="Refunded" selected="@(ViewBag.CurrentPaymentStatus == "Refunded")">Đã hoàn tiền (Refunded)</option>
+            </select>
+        </div>
+
     </form>
 </div>
 
-<div class="bg-white rounded-xl border border-outline-variant/30 shadow-[0_4px_20px_rgba(0,0,0,0.02)] overflow-hidden">
+<div class="bg-white rounded-xl border border-outline-variant/30 shadow-[0_4px_20px_rgba(0,0,0,0.02)] overflow-hidden font-sans">
     <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse min-w-[800px]">
+        <table class="w-full text-left border-collapse min-w-[950px]">
             <thead>
-                <tr class="bg-surface-container-low border-b border-outline-variant/30">
-                    <th class="px-6 py-4 font-label-md text-xs text-on-surface-variant uppercase tracking-wider font-bold">Mã ĐH</th>
-                    <th class="px-6 py-4 font-label-md text-xs text-on-surface-variant uppercase tracking-wider font-bold">Khách hàng</th>
-                    <th class="px-6 py-4 font-label-md text-xs text-on-surface-variant uppercase tracking-wider font-bold">Ngày đặt</th>
-                    <th class="px-6 py-4 font-label-md text-xs text-on-surface-variant uppercase tracking-wider font-bold">Tổng tiền</th>
-                    <th class="px-6 py-4 font-label-md text-xs text-on-surface-variant uppercase tracking-wider font-bold">Trạng thái</th>
-                    <th class="px-6 py-4 font-label-md text-xs text-on-surface-variant uppercase tracking-wider font-bold text-right">Hành động</th>
+                <tr class="bg-surface-container-low border-b border-outline-variant/30 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+                    <th class="px-6 py-4">Mã ĐH</th>
+                    <th class="px-6 py-4">Khách hàng</th>
+                    <th class="px-6 py-4">Ngày đặt</th>
+                    <th class="px-6 py-4 text-right">Tổng hóa đơn</th>
+                    <th class="px-6 py-4 text-center">Tiến độ xử lý</th>
+                    <th class="px-6 py-4 text-center">Dòng tiền</th>
+                    <th class="px-6 py-4 text-right">Hành động</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-outline-variant/10">
+            <tbody class="divide-y divide-outline-variant/10 text-sm font-medium">
                 @foreach (var item in Model)
                 {
-                    <tr class="hover:bg-primary/5 transition-colors group">
-                        <td class="px-6 py-4 font-body-md text-sm font-semibold text-on-surface">
+                    <tr class="hover:bg-primary/5 transition-colors group align-middle">
+                        <td class="px-6 py-4 font-bold text-primary">
                             #@item.Id.ToString("D5")
                         </td>
+
                         <td class="px-6 py-4">
-                            <div class="font-body-md text-sm font-medium text-on-surface">@item.FullName</div>
-                            <div class="font-label-md text-xs text-on-surface-variant mt-0.5">@item.PhoneNumber</div>
+                            <div class="text-on-surface font-bold text-xs">@item.FullName</div>
+                            <div class="text-[11px] text-on-surface-variant/70 mt-0.5">@item.PhoneNumber</div>
                         </td>
-                        <td class="px-6 py-4 font-body-md text-sm text-on-surface-variant">
+
+                        <td class="px-6 py-4 text-xs text-on-surface-variant">
                             @item.OrderDate.ToString("dd/MM/yyyy HH:mm")
                         </td>
-                        <td class="px-6 py-4 font-headline-md text-base text-primary font-bold">
+
+                        <td class="px-6 py-4 text-right font-bold text-on-background">
                             @string.Format("{0:N0} ₫", item.TotalAmount)
                         </td>
-                        <td class="px-6 py-4">
+
+                        <td class="px-6 py-4 text-center">
                             @{
-                                string badgeBg = "bg-surface-variant/50";
-                                string badgeText = "text-on-surface";
+                                string statusBg = "bg-surface-variant/50 border border-outline-variant/30 text-on-surface";
                                 string statusText = item.Status;
 
-                                switch (item.Status?.ToLower())
+                                switch (item.Status)
                                 {
-                                    case "pending": 
-                                        badgeBg = "bg-[#c5a059]/10"; 
-                                        badgeText = "text-[#4e3700]"; 
-                                        statusText = "Chờ xử lý"; 
+                                    case "Pending":
+                                        statusBg = "bg-amber-50 border border-amber-200 text-amber-700";
+                                        statusText = "Chờ duyệt";
                                         break;
-                                    case "processing": 
-                                        badgeBg = "bg-[#c5a059]/20"; 
-                                        badgeText = "text-[#4e3700]"; 
-                                        statusText = "Đang xử lý"; 
+                                    case "Processing":
+                                        statusBg = "bg-blue-50 border border-blue-200 text-blue-700";
+                                        statusText = "Chế tác";
                                         break;
-                                    case "shipped": 
-                                        badgeBg = "bg-[#a5a6a2]/20"; 
-                                        badgeText = "text-[#3a3c39]"; 
-                                        statusText = "Đang giao"; 
+                                    case "Shipping":
+                                        statusBg = "bg-indigo-50 border border-indigo-200 text-indigo-700";
+                                        statusText = "Đang giao";
                                         break;
-                                    case "completed": 
-                                        badgeBg = "bg-[#e4e2e1]/40"; 
-                                        badgeText = "text-[#474747]"; 
-                                        statusText = "Đã hoàn thành"; 
+                                    case "Projected":
+                                    case "Completed":
+                                        statusBg = "bg-emerald-50 border border-emerald-200 text-emerald-700";
+                                        statusText = "Thành công";
                                         break;
-                                    case "cancelled": 
-                                        badgeBg = "bg-[#ffdad6]"; 
-                                        badgeText = "text-[#93000a]"; 
-                                        statusText = "Đã hủy"; 
+                                    case "Cancelled":
+                                        statusBg = "bg-red-50 border border-red-200 text-red-600";
+                                        statusText = "Đã hủy";
                                         break;
                                 }
                             }
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider @badgeBg @badgeText">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider @statusBg">
                                 @statusText
                             </span>
                         </td>
+
+                        <td class="px-6 py-4 text-center">
+                            @if (item.PaymentStatus == "Paid")
+                            {
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-100/60 border border-emerald-200 text-emerald-800 rounded-full text-[10px] font-bold tracking-wider">
+                                    <span class="w-1 h-1 rounded-full bg-emerald-600"></span> ĐÃ THÀNH TOÁN
+                                </span>
+                            }
+                            else if (item.PaymentStatus == "Refunded")
+                            {
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-amber-50 border border-amber-200 text-amber-700 rounded-full text-[10px] font-bold tracking-wider">
+                                    <span class="w-1 h-1 rounded-full bg-amber-500"></span> ĐÃ HOÀN TIỀN
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-red-50 border border-red-200 text-red-700 rounded-full text-[10px] font-bold tracking-wider">
+                                    <span class="w-1 h-1 rounded-full bg-red-500"></span> CHƯA TRẢ TIỀN
+                                </span>
+                            }
+                        </td>
+
                         <td class="px-6 py-4 text-right">
-                            <a asp-action="Details" asp-route-id="@item.Id" 
-                               class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-outline-variant rounded-md text-xs font-bold uppercase tracking-wider text-on-surface hover:border-primary hover:text-primary transition-all no-underline">
+                            <a asp-action="Details" asp-route-id="@item.Id"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-outline rounded-md text-xs font-bold uppercase tracking-wider text-on-surface hover:border-primary hover:text-primary transition-all no-underline bg-transparent cursor-pointer">
                                 <span class="material-symbols-outlined text-[16px]">visibility</span>
                                 Chi tiết
                             </a>
                         </td>
                     </tr>
                 }
-                
+
                 @if (!Model.Any())
                 {
                     <tr>
-                        <td colspan="6" class="px-6 py-12 text-center">
+                        <td colspan="7" class="px-6 py-16 text-center bg-[#faf9f7]/40">
                             <span class="material-symbols-outlined text-4xl text-outline-variant mb-2">inbox</span>
-                            <p class="font-body-md text-sm text-on-surface-variant m-0">Không tìm thấy đơn hàng nào.</p>
+                            <p class="text-sm font-semibold text-on-surface-variant m-0">Không tìm thấy vận đơn trang sức nào khớp với điều kiện lọc.</p>
                         </td>
                     </tr>
                 }

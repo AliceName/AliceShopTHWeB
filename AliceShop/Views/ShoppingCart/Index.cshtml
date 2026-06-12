@@ -49,11 +49,17 @@
                                     <td class="p-5">
                                         <div class="flex items-center gap-4">
                                             <div class="w-16 aspect-[4/5] bg-surface-container-low rounded overflow-hidden border border-outline-variant/20 flex-shrink-0">
-                                                <img src="@productImg" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/images/placeholder.png';" />
+                                                <a asp-controller="Product" asp-action="Details" asp-route-id="@item.ProductSizeVariant?.ProductId"
+                                                   class="w-16 aspect-[4/5] bg-surface-container-low rounded overflow-hidden border border-outline-variant/20 flex-shrink-0 block hover:opacity-80 transition-opacity">
+                                                    <img src="@productImg" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/images/placeholder.png';" />
+                                                </a>
                                             </div>
                                             <div class="space-y-1">
-                                                <h4 class="font-serif font-medium text-sm md:text-base text-on-background uppercase tracking-wide m-0 line-clamp-1">
-                                                    @item.ProductSizeVariant?.Product?.Name
+                                                <h4 class="font-serif font-medium text-sm md:text-base tracking-wide m-0 line-clamp-1">
+                                                    <a asp-controller="Product" asp-action="Details" asp-route-id="@item.ProductSizeVariant?.ProductId"
+                                                       class="text-on-background hover:text-primary no-underline transition-colors">
+                                                        @item.ProductSizeVariant?.Product?.Name
+                                                    </a>
                                                 </h4>
                                                 <span class="inline-flex px-2 py-0.5 bg-primary/5 border border-primary/10 rounded text-[11px] font-bold text-primary uppercase tracking-tight">
                                                     Kích cỡ: @item.ProductSizeVariant?.ProductSize?.SizeName

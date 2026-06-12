@@ -41,6 +41,11 @@ namespace AliceShop.Models
         [Required]
         [StringLength(50)]
         public string Status { get; set; } = "Pending"; // Pending, Processing, Shipped, Completed, Cancelled
+        // phương thức thanh toán
+        public string PaymentMethod { get; set; } = "BankTransfer";
+
+        //Trạng thái thanh toán 
+        public string PaymentStatus { get; set; } = "Unpaid";
 
         // Quan hệ 1-N sang bảng chi tiết đơn hàng
         public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
